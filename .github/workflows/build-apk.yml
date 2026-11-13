@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Java & Android SDK
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -16,9 +16,14 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.5'
+
       - name: Build Customer & Admin APKs
         run: |
-          mkdir -p app/src/main/java/com/gogroc/store app/src/main/res/values
+          mkdir -p app/src/main/java/com/gogroc/store
           cat << 'EOF' > build.gradle
           buildscript {
               repositories { google(); mavenCentral() }
@@ -96,14 +101,13 @@ jobs:
           }
           EOF
 
-          gradle wrapper --gradle-version 8.5
-          ./gradlew assembleDebug
+          gradle assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk GO-GROC-Customer.apk
 
           sed -i 's/GO-GROC/GO-GROC Admin/g' app/src/main/AndroidManifest.xml
           sed -i 's/com.gogroc.store/com.gogroc.admin/g' app/build.gradle
           sed -i 's|github.io/GO-GROC/|github.io/GO-GROC/admin.html|g' app/src/main/java/com/gogroc/store/MainActivity.java
-          ./gradlew assembleDebug
+          gradle assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk GO-GROC-Admin.apk
 
       - name: Upload Clean APKs
@@ -113,4 +117,3 @@ jobs:
           path: |
             GO-GROC-Customer.apk
             GO-GROC-Admin.apk
-            
