@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GO-GROC Admin Panel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+  body { background: #121212; color: #fff; padding-bottom: 40px; }
+  header { background: #1A1A1A; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2A2A2A; }
+  .logo { color: #2ECC71; font-size: 20px; font-weight: 800; }
+  .tabs { display: flex; background: #1A1A1A; border-bottom: 1px solid #2A2A2A; }
+  .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 14px; color: #888; cursor: pointer; border-bottom: 3px solid transparent; }
+  .tab.active { color: #2ECC71; border-bottom-color: #2ECC71; }
+  .section { padding: 14px; display: none; }
+  .section.active { display: block; }
+  .card { background: #1E1E1E; border: 1px solid #2E2E2E; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .badge { background: #2ECC71; color: #000; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+  .status-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 12px 0; }
+  .st-btn { background: #2A2A2A; color: #ccc; border: 1px solid #3A3A3A; padding: 7px 4px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .st-btn.active { background: #2ECC71; color: #000; border-color: #2ECC71; }
+  .action-row { display: flex; gap: 8px; }
+  .btn-call { flex: 1; background: #F1C40F; color: #000; text-align: center; text-decoration: none; padding: 9px; border-radius: 8px; font-weight: 800; font-size: 13px; }
+  .btn-del { flex: 1; background: #3A1E1E; color: #E74C3C; border: 1px solid #E74C3C; padding: 9px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+  .input-box { width: 100%; background: #262626; border: 1px solid #333; color: #fff; padding: 11px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
+  .btn-primary { width: 100%; background: #2ECC71; color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 15px; cursor: pointer; }
+  .menu-row { display: flex; align-items: center; justify-content: space-between; background: #1E1E1E; border: 1px solid #2C2C2C; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+  .menu-row img { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; margin-right: 10px; background: #262626; }
+  .toggle-btn { padding: 6px 10px; border-radius: 8px; border: none; font-weight: 700; font-size: 11px; cursor: pointer; margin-right: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">GO-GROC</div>
+    <div style="font-size:11px;color:#999;">ADMIN PANEL</div>
+  </div>
+  <button id="storeToggleBtn" onclick="toggleStore()" style="background:#2ECC71;color:#000;border:none;padding:8px 14px;border-radius:20px;font-weight:800;font-size:12px;">STORE OPEN</button>
+</header>
+
+<div class="tabs">
+  <div id="tabOrders" class="tab active" onclick="switchTab('orders')">LIVE ORDERS</div>
+  <div id="tabMenu" class="tab" onclick="switchTab('menu')">MENU MANAGER</div>
+</div>
+
+<div id="ordersSection" class="section active">
+  <div id="ordersList"><p style="text-align:center;color:#777;padding:30px;">Loading orders...</p></div>
+</div>
+
+<div id="menuSection" class="section">
+  <div class="card">
+    <h3 style="margin-bottom:10px;font-size:16px;">Add New Item</h3>
+    <input type="text" id="itemName" class="input-box" placeholder="Item Name (e.g., Fresh Onions 1kg)">
+    <input type="number" id="itemPrice" class="input-box" placeholder="Price in ₹ (e.g., 50)">
+    <input type="text" id="itemDesc" class="input-box" placeholder="Short Description">
+    <input type="file" id="itemPhoto" accept="image/*" class="input-box" onchange="compressImage(event)">
+    <img id="previewImg" style="width:70px;height:70px;object-fit:cover;border-radius:8px;display:none;margin-bottom:10px;">
+    <button id="addItemBtn" class="btn-primary" onclick="addMenuItem()">Add Item to Menu</button>
+  </div>
+  <h4 style="margin-bottom:10px;color:#ccc;">Current Menu Items</h4>
+  <div id="menuList"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = { projectId: "go-groc-f488d" };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let storeOpen = true;
+  let compressedBase64 = "";
+
+  window.switchTab = (t) => {
+    document.getElementById("tabOrders").className = t === "orders" ? "tab active" : "tab";
+    document.getElementById("tabMenu").className = t === "menu" ? "tab active" : "tab";
+    document.getElementById("ordersSection").className = t === "orders" ? "section active" : "section";
+    document.getElementById("menuSection").className = t === "menu" ? "section active" : "section";
+  };
+
+  onSnapshot(doc(db, "settings", "store"), (snap) => {
+    storeOpen = snap.exists() ? snap.data().isOpen !== false : true;
+    const btn = document.getElementById("storeToggleBtn");
+    btn.textContent = storeOpen ? "STORE OPEN" : "STORE CLOSED";
+    btn.style.background = storeOpen ? "#2ECC71" : "#E74C3C";
+    btn.style.color = storeOpen ? "#000" : "#fff";
+  });
+
+  window.toggleStore = async () => {
+    await setDoc(doc(db, "settings", "store"), { isOpen: !storeOpen }, { merge: true });
+  };
+
+  onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")), (snap) => {
+    const container = document.getElementById("ordersList");
+    if (snap.empty) {
+      container.innerHTML = `<p style="text-align:center;color:#777;padding:30px;">No orders yet.</p>`;
+      return;
+    }
+    container.innerHTML = snap.docs.map(d => {
+      const o = d.data();
+      const itemsHtml = (o.items || []).map(i => `<div>${i.qty}x ${i.name} — ₹${i.price * i.qty}</div>`).join("");
+      const statuses = ["Placed", "Preparing", "Out for Delivery", "Completed"];
+      return `
+        <div class="card">
+          <div class="order-top">
+            <b>#${d.id.slice(0,6).toUpperCase()}</b>
+            <span class="badge">${o.status || "Placed"}</span>
+          </div>
+          <div style="font-size:14px;margin-bottom:4px;"><b>${o.customerName}</b> (${o.phone})</div>
+          <div style="font-size:12px;color:#aaa;margin-bottom:10px;">📍 ${o.address}</div>
+          <div style="font-size:13px;background:#161616;padding:8px;border-radius:8px;margin-bottom:8px;">${itemsHtml}</div>
+          <div style="font-size:16px;font-weight:800;color:#2ECC71;text-align:right;">Total: ₹${o.total}</div>
+          <div class="status-btns">
+            ${statuses.map(s => `<button class="st-btn ${o.status === s ? 'active' : ''}" onclick="setOrderStatus('${d.id}','${s}')">${s}</button>`).join("")}
+          </div>
+          <div class="action-row">
+            <a href="tel:${o.phone}" class="btn-call">CALL CUSTOMER</a>
+            <button class="btn-del" onclick="removeOrder('${d.id}')">DELETE</button>
+          </div>
+        </div>`;
+    }).join("");
+  });
+
+  window.setOrderStatus = async (id, status) => {
+    await updateDoc(doc(db, "orders", id), { status });
+  };
+
+  window.removeOrder = async (id) => {
+    if (confirm("Delete this order permanently?")) await deleteDoc(doc(db, "orders", id));
+  };
+
+  window.compressImage = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxW = 320;
+        const scale = maxW / img.width;
+        canvas.width = maxW;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        compressedBase64 = canvas.toDataURL("image/jpeg", 0.65);
+        const prev = document.getElementById("previewImg");
+        prev.src = compressedBase64;
+        prev.style.display = "block";
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.addMenuItem = async () => {
+    const name = document.getElementById("itemName").value.trim();
+    const price = Number(document.getElementById("itemPrice").value);
+    const desc = document.getElementById("itemDesc").value.trim();
+    if (!name || !price) { alert("Please enter item name and price!"); return; }
+
+    const btn = document.getElementById("addItemBtn");
+    btn.disabled = true; btn.textContent = "Saving...";
+    try {
+      await addDoc(collection(db, "menu"), {
+        name, price, desc,
+        image: compressedBase64,
+        inStock: true
+      });
+      document.getElementById("itemName").value = "";
+      document.getElementById("itemPrice").value = "";
+      document.getElementById("itemDesc").value = "";
+      document.getElementById("itemPhoto").value = "";
+      document.getElementById("previewImg").style.display = "none";
+      compressedBase64 = "";
+    } catch (e) {
+      alert("Error: " + e.message);
+    }
+    btn.disabled = false; btn.textContent = "Add Item to Menu";
+  };
+
+  onSnapshot(collection(db, "menu"), (snap) => {
+    document.getElementById("menuList").innerHTML = snap.docs.map(d => {
+      const m = d.data();
+      const stock = m.inStock !== false;
+      return `
+        <div class="menu-row">
+          <div style="display:flex;align-items:center;">
+            <img src="${m.image || 'https://via.placeholder.com/60/262626/2ECC71?text=Item'}">
+            <div>
+              <div style="font-weight:700;font-size:14px;">${m.name}</div>
+              <div style="color:#2ECC71;font-weight:700;font-size:13px;">₹${m.price}</div>
+            </div>
+          </div>
+          <div>
+            <button class="toggle-btn" style="background:${stock ? '#2ECC71' : '#555'};color:${stock ? '#000' : '#fff'}" onclick="toggleStock('${d.id}', ${stock})">${stock ? 'In Stock' : 'Out'}</button>
+            <button class="toggle-btn" style="background:#3A1E1E;color:#E74C3C;" onclick="deleteMenu('${d.id}')">Del</button>
+          </div>
+        </div>`;
+    }).join("");
+  });
+
+  window.toggleStock = async (id, current) => {
+    await updateDoc(doc(db, "menu", id), { inStock: !current });
+  };
+
+  window.deleteMenu = async (id) => {
+    if (confirm("Delete this item from menu?")) await deleteDoc(doc(db, "menu", id));
+  };
+</script>
+</body>
+</html>
