@@ -7,6 +7,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
@@ -22,6 +25,9 @@ jobs:
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           mkdir -p app/src/main/java/com/gogroc/store
+          mkdir -p app/src/main/res/mipmap-xxxhdpi
+          cp icon.png app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
           cat << 'EOF' > build.gradle
           buildscript {
               repositories { google(); mavenCentral() }
@@ -59,7 +65,7 @@ jobs:
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET"/>
-              <application android:label="GO-GROC" android:theme="@android:style/Theme.NoTitleBar">
+              <application android:label="GO-GROC" android:icon="@mipmap/ic_launcher" android:theme="@android:style/Theme.NoTitleBar">
                   <activity android:name=".MainActivity" android:exported="true">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN"/>
