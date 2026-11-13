@@ -26,7 +26,13 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           mkdir -p app/src/main/java/com/gogroc/store
           mkdir -p app/src/main/res/mipmap-xxxhdpi
-          cp icon.png app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+          IMG_FILE=$(ls icon.* *.png *.jpg *.jpeg *.webp 2>/dev/null | head -n 1)
+          if [ -n "$IMG_FILE" ]; then
+            convert "$IMG_FILE" -resize 512x512 PNG32:app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          else
+            convert -size 512x512 xc:#16a34a PNG32:app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          fi
 
           cat << 'EOF' > build.gradle
           buildscript {
