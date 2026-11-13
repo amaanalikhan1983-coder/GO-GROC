@@ -28,23 +28,27 @@ jobs:
           mkdir -p app/src/main/res/mipmap-xxxhdpi
 
           python3 -c '
-          import glob, os
-          from PIL import Image
-          files = [f for f in glob.glob("*") if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))]
-          files.sort(key=lambda x: (0 if "icon" in x.lower() else 1))
-          if files:
-              img = Image.open(files[0]).convert("RGBA").resize((512, 512))
-          else:
-              img = Image.new("RGBA", (512, 512), (22, 163, 74, 255))
-          img.save("app/src/main/res/mipmap-xxxhdpi/ic_launcher.png", "PNG")
-          ' || pip install pillow && python3 -c '
           import glob
           from PIL import Image
           files = [f for f in glob.glob("*") if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))]
           files.sort(key=lambda x: (0 if "icon" in x.lower() else 1))
-          img = Image.open(files[0]).convert("RGBA").resize((512, 512)) if files else Image.new("RGBA", (512, 512), (22, 163, 74, 255))
+          if files:
+              img = Image.open(files[0]).convert("RGBA")
+              w, h = img.size
+              img = img.crop((int(w*0.18), int(h*0.12), int(w*0.82), int(h*0.66))).resize((512, 512))
+          else:
+              img = Image.new("RGBA", (512, 512), (22, 163, 74, 255))
           img.save("app/src/main/res/mipmap-xxxhdpi/ic_launcher.png", "PNG")
-          '
+          ' || (pip install pillow && python3 -c '
+          import glob
+          from PIL import Image
+          files = [f for f in glob.glob("*") if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))]
+          files.sort(key=lambda x: (0 if "icon" in x.lower() else 1))
+          img = Image.open(files[0]).convert("RGBA")
+          w, h = img.size
+          img = img.crop((int(w*0.18), int(h*0.12), int(w*0.82), int(h*0.66))).resize((512, 512))
+          img.save("app/src/main/res/mipmap-xxxhdpi/ic_launcher.png", "PNG")
+          ')
 
           cat << 'EOF' > build.gradle
           buildscript {
@@ -84,7 +88,7 @@ jobs:
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET"/>
               <application android:label="GO-GROC" android:icon="@mipmap/ic_launcher" android:theme="@android:style/Theme.NoTitleBar">
-                  <activity android:name=".MainActivity" android:exported="true">
+                  <activity android:name="com.gogroc.store.MainActivity" android:exported="true">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN"/>
                           <category android:name="android.intent.category.LAUNCHER"/>
@@ -126,8 +130,8 @@ jobs:
           gradle assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk GO-GROC-Customer.apk
 
-          sed -i 's/GO-GROC/GO-GROC Admin/g' app/src/main/AndroidManifest.xml
-          sed -i 's/com.gogroc.store/com.gogroc.admin/g' app/build.gradle
+          sed -i 's/android:label="GO-GROC"/android:label="GO-GROC Admin"/g' app/src/main/AndroidManifest.xml
+          sed -i 's/applicationId "com.gogroc.store"/applicationId "com.gogroc.admin"/g' app/build.gradle
           sed -i 's|github.io/GO-GROC/|github.io/GO-GROC/admin.html|g' app/src/main/java/com/gogroc/store/MainActivity.java
           gradle assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk GO-GROC-Admin.apk
