@@ -27,12 +27,24 @@ jobs:
           mkdir -p app/src/main/java/com/gogroc/store
           mkdir -p app/src/main/res/mipmap-xxxhdpi
 
-          IMG_FILE=$(ls icon.* *.png *.jpg *.jpeg *.webp 2>/dev/null | head -n 1)
-          if [ -n "$IMG_FILE" ]; then
-            convert "$IMG_FILE" -resize 512x512 PNG32:app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-          else
-            convert -size 512x512 xc:#16a34a PNG32:app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-          fi
+          python3 -c '
+          import glob, os
+          from PIL import Image
+          files = [f for f in glob.glob("*") if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))]
+          files.sort(key=lambda x: (0 if "icon" in x.lower() else 1))
+          if files:
+              img = Image.open(files[0]).convert("RGBA").resize((512, 512))
+          else:
+              img = Image.new("RGBA", (512, 512), (22, 163, 74, 255))
+          img.save("app/src/main/res/mipmap-xxxhdpi/ic_launcher.png", "PNG")
+          ' || pip install pillow && python3 -c '
+          import glob
+          from PIL import Image
+          files = [f for f in glob.glob("*") if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))]
+          files.sort(key=lambda x: (0 if "icon" in x.lower() else 1))
+          img = Image.open(files[0]).convert("RGBA").resize((512, 512)) if files else Image.new("RGBA", (512, 512), (22, 163, 74, 255))
+          img.save("app/src/main/res/mipmap-xxxhdpi/ic_launcher.png", "PNG")
+          '
 
           cat << 'EOF' > build.gradle
           buildscript {
