@@ -13,9 +13,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -23,6 +20,7 @@ jobs:
 
       - name: Build Customer & Admin APKs
         run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           mkdir -p app/src/main/java/com/gogroc/store
           cat << 'EOF' > build.gradle
           buildscript {
@@ -117,3 +115,4 @@ jobs:
           path: |
             GO-GROC-Customer.apk
             GO-GROC-Admin.apk
+            
