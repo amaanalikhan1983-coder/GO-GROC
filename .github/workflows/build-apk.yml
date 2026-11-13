@@ -1,0 +1,116 @@
+name: Build GO-GROC APKs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Java & Android SDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Customer & Admin APKs
+        run: |
+          mkdir -p app/src/main/java/com/gogroc/store app/src/main/res/values
+          cat << 'EOF' > build.gradle
+          buildscript {
+              repositories { google(); mavenCentral() }
+              dependencies { classpath 'com.android.tools.build:gradle:8.2.2' }
+          }
+          allprojects { repositories { google(); mavenCentral() } }
+          EOF
+
+          cat << 'EOF' > settings.gradle
+          include ':app'
+          EOF
+
+          cat << 'EOF' > gradle.properties
+          android.useAndroidX=true
+          EOF
+
+          cat << 'EOF' > app/build.gradle
+          apply plugin: 'com.android.application'
+          android {
+              namespace 'com.gogroc.store'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.gogroc.store"
+                  minSdk 21
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+              buildTypes {
+                  release { minifyEnabled false }
+              }
+          }
+          EOF
+
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <application android:label="GO-GROC" android:theme="@android:style/Theme.NoTitleBar">
+                  <activity android:name=".MainActivity" android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          cat << 'EOF' > app/src/main/java/com/gogroc/store/MainActivity.java
+          package com.gogroc.store;
+          import android.app.Activity;
+          import android.os.Bundle;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          public class MainActivity extends Activity {
+              private WebView webView;
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  webView = new WebView(this);
+                  WebSettings ws = webView.getSettings();
+                  ws.setJavaScriptEnabled(true);
+                  ws.setDomStorageEnabled(true);
+                  ws.setAllowFileAccess(true);
+                  webView.setWebViewClient(new WebViewClient());
+                  webView.loadUrl("https://amaanalikhan1983-coder.github.io/GO-GROC/");
+                  setContentView(webView);
+              }
+              @Override
+              public void onBackPressed() {
+                  if (webView.canGoBack()) webView.goBack();
+                  else super.onBackPressed();
+              }
+          }
+          EOF
+
+          gradle wrapper --gradle-version 8.5
+          ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk GO-GROC-Customer.apk
+
+          sed -i 's/GO-GROC/GO-GROC Admin/g' app/src/main/AndroidManifest.xml
+          sed -i 's/com.gogroc.store/com.gogroc.admin/g' app/build.gradle
+          sed -i 's|github.io/GO-GROC/|github.io/GO-GROC/admin.html|g' app/src/main/java/com/gogroc/store/MainActivity.java
+          ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk GO-GROC-Admin.apk
+
+      - name: Upload Clean APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: GO-GROC-APKs
+          path: |
+            GO-GROC-Customer.apk
+            GO-GROC-Admin.apk
+            
