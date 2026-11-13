@@ -8,9 +8,12 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
   body { background: #121212; color: #fff; padding-bottom: 90px; }
   header { background: #1A1A1A; padding: 14px 16px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #2A2A2A; }
-  .brand-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .brand-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
   .logo { color: #2ECC71; font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
-  .status-pill { font-size: 12px; padding: 4px 10px; border-radius: 20px; background: #1E3A2A; color: #2ECC71; font-weight: 600; }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
+  .track-btn { background: #262626; border: 1px solid #2ECC71; color: #2ECC71; font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+  .track-dot { width: 7px; height: 7px; border-radius: 50%; background: #2ECC71; display: none; }
+  .status-pill { font-size: 11px; padding: 5px 10px; border-radius: 20px; background: #1E3A2A; color: #2ECC71; font-weight: 600; }
   .status-closed { background: #3A1E1E; color: #E74C3C; }
   .search-box { width: 100%; background: #262626; border: 1px solid #333; color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 14px; outline: none; }
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
@@ -28,11 +31,29 @@
   .out-badge { font-size: 11px; color: #E74C3C; font-weight: 600; }
   .cart-bar { position: fixed; bottom: 14px; left: 14px; right: 14px; background: #2ECC71; color: #000; padding: 14px 18px; border-radius: 14px; display: none; justify-content: space-between; align-items: center; font-weight: 800; box-shadow: 0 6px 20px rgba(0,0,0,0.6); z-index: 200; cursor: pointer; }
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: flex-end; z-index: 300; }
-  .modal-content { background: #1A1A1A; width: 100%; border-radius: 20px 20px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; }
+  .modal-content { background: #1A1A1A; width: 100%; border-radius: 20px 20px 0 0; padding: 20px; max-height: 88vh; overflow-y: auto; }
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .input-field { width: 100%; background: #262626; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; }
+  .input-field { width: 100%; background: #262626; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; outline: none; }
   .btn-order { width: 100%; background: #2ECC71; color: #000; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 800; margin-top: 8px; cursor: pointer; }
   .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #2A2A2A; font-size: 14px; }
+
+  /* Order Tracking Styles */
+  .order-card { background: #222; border: 1px solid #333; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .order-id { font-size: 12px; color: #aaa; font-weight: 600; }
+  .badge-status { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #1E3A2A; color: #2ECC71; }
+  .badge-cancelled { background: #3A1E1E; color: #E74C3C; }
+  .progress-track { display: flex; justify-content: space-between; position: relative; margin: 14px 0 10px; }
+  .progress-track::before { content: ""; position: absolute; top: 9px; left: 10%; right: 10%; height: 3px; background: #333; z-index: 1; }
+  .step { position: relative; z-index: 2; text-align: center; width: 33.3%; font-size: 11px; color: #777; }
+  .step-dot { width: 20px; height: 20px; border-radius: 50%; background: #333; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #000; }
+  .step.active { color: #2ECC71; font-weight: 700; }
+  .step.active .step-dot { background: #2ECC71; }
+  .order-items-txt { font-size: 13px; color: #ddd; margin: 8px 0; line-height: 1.4; }
+  .order-foot { display: flex; justify-content: space-between; font-size: 13px; color: #aaa; border-top: 1px solid #2F2F2F; padding-top: 8px; margin-top: 6px; }
+  .phone-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+  .phone-bar input { margin-bottom: 0; }
+  .btn-find { background: #2ECC71; color: #000; border: none; padding: 0 16px; border-radius: 10px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -40,7 +61,12 @@
 <header>
   <div class="brand-row">
     <div class="logo">GO-GROC</div>
-    <div id="storeStatus" class="status-pill">● STORE OPEN</div>
+    <div class="header-actions">
+      <button class="track-btn" onclick="openTracking()">
+        <span id="trackDot" class="track-dot"></span>📦 Track Order
+      </button>
+      <div id="storeStatus" class="status-pill">● OPEN</div>
+    </div>
   </div>
   <input type="text" id="searchInput" class="search-box" placeholder="Search 'milk', 'atta', 'chips'..." oninput="renderItems()">
 </header>
@@ -54,6 +80,7 @@
   <span>Proceed to Order →</span>
 </div>
 
+<!-- Checkout Modal -->
 <div id="checkoutModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -68,6 +95,23 @@
   </div>
 </div>
 
+<!-- Live Order Tracking Modal -->
+<div id="trackingModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📦 Live Order Tracking</h3>
+      <span onclick="closeTracking()" style="font-size:22px; cursor:pointer; color:#aaa;">✕</span>
+    </div>
+    <div class="phone-bar">
+      <input type="tel" id="trackPhoneInput" class="input-field" placeholder="Enter Mobile Number to track...">
+      <button class="btn-find" onclick="saveAndTrackPhone()">Track</button>
+    </div>
+    <div id="ordersList">
+      <p style="text-align:center; color:#888; padding:24px 0;">Enter your mobile number above to see live order status.</p>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, onSnapshot, addDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -77,14 +121,26 @@
   const db = getFirestore(app);
 
   let allItems = [];
+  let allOrders = [];
   let cart = {};
   let isStoreOpen = true;
+
+  // Load saved customer details if available
+  const savedName = localStorage.getItem("gogroc_name") || "";
+  const savedPhone = localStorage.getItem("gogroc_phone") || "";
+  const savedAddress = localStorage.getItem("gogroc_address") || "";
+  if (savedName) document.getElementById("custName").value = savedName;
+  if (savedPhone) {
+    document.getElementById("custPhone").value = savedPhone;
+    document.getElementById("trackPhoneInput").value = savedPhone;
+  }
+  if (savedAddress) document.getElementById("custAddress").value = savedAddress;
 
   onSnapshot(doc(db, "settings", "store"), (snap) => {
     if (snap.exists()) {
       isStoreOpen = snap.data().isOpen !== false;
       const el = document.getElementById("storeStatus");
-      el.textContent = isStoreOpen ? "● STORE OPEN" : "● STORE CLOSED";
+      el.textContent = isStoreOpen ? "● OPEN" : "● CLOSED";
       el.className = isStoreOpen ? "status-pill" : "status-pill status-closed";
     }
   });
@@ -92,6 +148,13 @@
   onSnapshot(collection(db, "menu"), (snapshot) => {
     allItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     renderItems();
+  });
+
+  // Real-time listener for all orders (filtered on client by customer phone / saved IDs)
+  onSnapshot(collection(db, "orders"), (snapshot) => {
+    allOrders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    allOrders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    renderTracking();
   });
 
   window.renderItems = () => {
@@ -169,6 +232,73 @@
 
   window.closeCheckout = () => { document.getElementById("checkoutModal").style.display = "none"; };
 
+  window.openTracking = () => {
+    document.getElementById("trackingModal").style.display = "flex";
+    renderTracking();
+  };
+
+  window.closeTracking = () => { document.getElementById("trackingModal").style.display = "none"; };
+
+  window.saveAndTrackPhone = () => {
+    const p = document.getElementById("trackPhoneInput").value.trim();
+    if (p) localStorage.setItem("gogroc_phone", p);
+    renderTracking();
+  };
+
+  function renderTracking() {
+    const phoneQuery = (document.getElementById("trackPhoneInput").value || "").replace(/\D/g, "").slice(-10);
+    const savedIds = JSON.parse(localStorage.getItem("gogroc_order_ids") || "[]");
+
+    const myOrders = allOrders.filter(o => {
+      const oPhone = (o.phone || "").replace(/\D/g, "").slice(-10);
+      return (phoneQuery && oPhone === phoneQuery) || savedIds.includes(o.id);
+    });
+
+    const dot = document.getElementById("trackDot");
+    const hasActive = myOrders.some(o => !["Delivered", "Cancelled"].includes(o.status));
+    dot.style.display = hasActive ? "inline-block" : "none";
+
+    const container = document.getElementById("ordersList");
+    if (!myOrders.length) {
+      container.innerHTML = `<p style="text-align:center; color:#888; padding:24px 0;">No orders found for this number yet.</p>`;
+      return;
+    }
+
+    container.innerHTML = myOrders.map(o => {
+      const st = (o.status || "Placed").toLowerCase();
+      const isCancelled = st.includes("cancel");
+      const step2 = st.includes("accept") || st.includes("pack") || st.includes("out") || st.includes("way") || st.includes("deliver");
+      const step3 = st.includes("deliver");
+      const itemsText = (o.items || []).map(i => `${i.qty}x ${i.name}`).join(", ");
+      const timeStr = o.createdAt?.seconds ? new Date(o.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Just now";
+
+      return `
+        <div class="order-card">
+          <div class="order-top">
+            <span class="order-id">ORDER #${o.id.slice(0, 6).toUpperCase()} • ${timeStr}</span>
+            <span class="badge-status ${isCancelled ? 'badge-cancelled' : ''}">${o.status || "Placed"}</span>
+          </div>
+          ${isCancelled ? `<p style="color:#E74C3C;font-size:12px;margin:6px 0;">This order was cancelled by the store.</p>` : `
+          <div class="progress-track">
+            <div class="step active">
+              <div class="step-dot">✓</div>Placed
+            </div>
+            <div class="step ${step2 ? 'active' : ''}">
+              <div class="step-dot">${step2 ? '✓' : '2'}</div>Out for Delivery
+            </div>
+            <div class="step ${step3 ? 'active' : ''}">
+              <div class="step-dot">${step3 ? '✓' : '3'}</div>Delivered
+            </div>
+          </div>`}
+          <div class="order-items-txt">${itemsText}</div>
+          <div class="order-foot">
+            <span>📍 ${o.address || ""}</span>
+            <b style="color:#2ECC71;">₹${o.total} (COD)</b>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
   window.placeOrder = async () => {
     const name = document.getElementById("custName").value.trim();
     const phone = document.getElementById("custPhone").value.trim();
@@ -189,7 +319,7 @@
     }
 
     try {
-      await addDoc(collection(db, "orders"), {
+      const docRef = await addDoc(collection(db, "orders"), {
         customerName: name,
         phone,
         address,
@@ -198,11 +328,22 @@
         status: "Placed",
         createdAt: serverTimestamp()
       });
+
+      // Save customer info & order ID locally for instant tracking
+      localStorage.setItem("gogroc_name", name);
+      localStorage.setItem("gogroc_phone", phone);
+      localStorage.setItem("gogroc_address", address);
+      document.getElementById("trackPhoneInput").value = phone;
+
+      const savedIds = JSON.parse(localStorage.getItem("gogroc_order_ids") || "[]");
+      savedIds.unshift(docRef.id);
+      localStorage.setItem("gogroc_order_ids", JSON.stringify(savedIds.slice(0, 15)));
+
       cart = {};
       updateCartBar();
       renderItems();
       closeCheckout();
-      alert("Order Placed Successfully! Delivery is on the way.");
+      openTracking();
     } catch (e) {
       alert("Error placing order: " + e.message);
     }
