@@ -5,398 +5,286 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>GO-GROC</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-  body { background: #F4F6F9; color: #1A1D24; padding-bottom: 135px; }
-  header { background: #fff; padding: 12px 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .logo { color: #16A34A; font-size: 21px; font-weight: 900; }
-  .pill { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: #DCFCE7; color: #15803D; font-weight: 700; }
-  .pill.closed { background: #FEE2E2; color: #DC2626; }
-  .addr-bar { display: flex; justify-content: space-between; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 7px 10px; margin-bottom: 8px; font-size: 12px; cursor: pointer; }
-  .search { width: 100%; background: #F1F5F9; border: 1px solid #E2E8F0; padding: 10px 12px; border-radius: 10px; font-size: 14px; outline: none; }
-  .view { display: none; }
-  .view.active { display: block; }
-  .sec-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 14px 8px; }
-  .sec-title { font-size: 16px; font-weight: 800; }
-  .sec-link { font-size: 12px; font-weight: 700; color: #16A34A; cursor: pointer; }
-  .cat-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 14px 10px; }
-  .cat-chip { min-width: 76px; text-align: center; cursor: pointer; flex-shrink: 0; }
-  .cat-icon { width: 56px; height: 56px; border-radius: 14px; background: #fff; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 25px; margin: 0 auto 4px; }
-  .cat-chip.active .cat-icon { background: #DCFCE7; border-color: #16A34A; }
-  .cat-label { font-size: 11px; font-weight: 700; color: #334155; }
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 14px 14px; }
-  .card { background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-  .wish-btn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
-  .img-box { width: 100%; height: 105px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; font-size: 44px; overflow: hidden; }
-  .img-box img { width: 100%; height: 100%; object-fit: cover; }
-  .c-body { padding: 10px; }
-  .c-cat { font-size: 10px; font-weight: 700; color: #16A34A; text-transform: uppercase; }
-  .c-name { font-size: 13px; font-weight: 700; margin: 2px 0; }
-  .c-desc { font-size: 11px; color: #64748B; margin-bottom: 8px; }
-  .p-row { display: flex; justify-content: space-between; align-items: center; }
-  .mrp { font-size: 11px; color: #94A3B8; text-decoration: line-through; display: block; }
-  .price { font-size: 15px; font-weight: 800; }
-  .btn-add { background: #fff; color: #16A34A; border: 1.5px solid #16A34A; padding: 5px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
-  .qty-box { display: flex; align-items: center; background: #16A34A; border-radius: 8px; }
-  .qty-box button { background: none; border: none; color: #fff; font-weight: 800; padding: 5px 9px; font-size: 14px; cursor: pointer; }
-  .qty-box span { color: #fff; font-weight: 800; font-size: 12px; padding: 0 4px; }
-  .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
-  .cat-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; }
-  .cart-bar { position: fixed; bottom: 64px; left: 10px; right: 10px; background: #16A34A; color: #fff; border-radius: 14px; padding: 10px 14px; display: none; justify-content: space-between; align-items: center; z-index: 150; cursor: pointer; }
-  .cart-bar.locked { background: #1E293B; }
-  .nav { position: fixed; bottom: 0; left: 0; right: 0; height: 58px; background: #fff; border-top: 1px solid #E2E8F0; display: flex; z-index: 180; }
-  .nav-btn { flex: 1; text-align: center; color: #64748B; font-size: 11px; font-weight: 700; padding: 6px 0; cursor: pointer; }
-  .nav-btn.active { color: #16A34A; }
-  .modal { position: fixed; inset: 0; background: #F4F6F9; display: none; flex-direction: column; z-index: 300; overflow-y: auto; padding-bottom: 85px; }
-  .m-top { background: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; }
-  .box { background: #fff; margin: 12px; border-radius: 14px; padding: 14px; border: 1px solid #E2E8F0; }
-  .inp { width: 100%; border: 1px solid #CBD5E1; padding: 10px 12px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; }
-  .cta { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 12px 14px; border-top: 1px solid #E2E8F0; z-index: 320; }
-  .btn-main { width: 100%; background: #16A34A; color: #fff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; }
-  .btn-main:disabled { background: #94A3B8; }
-  .inv-box { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px; margin: 8px 0; font-size: 13px; }
-  .inv-row { display: flex; justify-content: space-between; padding: 3px 0; }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
+  body{background:#F4F6F9;color:#1A1D24;padding-bottom:135px}
+  header{background:#fff;padding:12px 14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .logo{color:#16A34A;font-size:21px;font-weight:900}
+  .pill{font-size:11px;padding:4px 10px;border-radius:20px;background:#DCFCE7;color:#15803D;font-weight:700}
+  .pill.closed{background:#FEE2E2;color:#DC2626}
+  .addr{display:flex;justify-content:space-between;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:7px 10px;margin-bottom:8px;font-size:12px;cursor:pointer}
+  .search{width:100%;background:#F1F5F9;border:1px solid #E2E8F0;padding:10px 12px;border-radius:10px;font-size:14px;outline:none}
+  .view{display:none}.view.active{display:block}
+  .head{display:flex;justify-content:space-between;align-items:center;padding:14px 14px 8px}
+  .strip{display:flex;gap:10px;overflow-x:auto;padding:6px 14px 10px}
+  .chip{min-width:76px;text-align:center;cursor:pointer;flex-shrink:0}
+  .cicon{width:56px;height:56px;border-radius:14px;background:#fff;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:25px;margin:0 auto 4px}
+  .chip.active .cicon{background:#DCFCE7;border-color:#16A34A}
+  .clbl{font-size:11px;font-weight:700;color:#334155}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:6px 14px 14px}
+  .card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+  .wbtn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+  .ibox{width:100%;height:105px;background:#F8FAFC;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden}
+  .ibox img{width:100%;height:100%;object-fit:cover}
+  .cbd{padding:10px}
+  .ccat{font-size:10px;font-weight:700;color:#16A34A;text-transform:uppercase}
+  .cname{font-size:13px;font-weight:700;margin:2px 0}
+  .cdesc{font-size:11px;color:#64748B;margin-bottom:8px}
+  .prow{display:flex;justify-content:space-between;align-items:center}
+  .mrp{font-size:11px;color:#94A3B8;text-decoration:line-through;display:block}
+  .price{font-size:15px;font-weight:800}
+  .badd{background:#fff;color:#16A34A;border:1.5px solid #16A34A;padding:5px 14px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer}
+  .qbox{display:flex;align-items:center;background:#16A34A;border-radius:8px}
+  .qbox button{background:none;border:none;color:#fff;font-weight:800;padding:5px 9px;font-size:14px;cursor:pointer}
+  .qbox span{color:#fff;font-weight:800;font-size:12px;padding:0 4px}
+  .cbar{position:fixed;bottom:64px;left:10px;right:10px;background:#16A34A;color:#fff;border-radius:14px;padding:10px 14px;display:none;justify-content:space-between;align-items:center;z-index:150;cursor:pointer}
+  .cbar.locked{background:#1E293B}
+  .nav{position:fixed;bottom:0;left:0;right:0;height:58px;background:#fff;border-top:1px solid #E2E8F0;display:flex;z-index:180}
+  .nbtn{flex:1;text-align:center;color:#64748B;font-size:11px;font-weight:700;padding:6px 0;cursor:pointer}
+  .nbtn.active{color:#16A34A}
+  .modal{position:fixed;inset:0;background:#F4F6F9;display:none;flex-direction:column;z-index:300;overflow-y:auto;padding-bottom:85px}
+  .mtop{background:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #E2E8F0;position:sticky;top:0}
+  .box{background:#fff;margin:12px;border-radius:14px;padding:14px;border:1px solid #E2E8F0}
+  .inp{width:100%;border:1px solid #CBD5E1;padding:10px 12px;border-radius:10px;margin-bottom:10px;font-size:14px}
+  .cta{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:12px 14px;border-top:1px solid #E2E8F0;z-index:320}
+  .bmain{width:100%;background:#16A34A;color:#fff;border:none;padding:13px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer}
+  .bmain:disabled{background:#94A3B8}
+  .ibox2{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px;margin:8px 0;font-size:13px}
+  .irow{display:flex;justify-content:space-between;padding:3px 0}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="top-bar">
-    <div class="logo">GO-GROC ⚡</div>
-    <div id="storeStatus" class="pill">● OPEN</div>
-  </div>
-  <div class="addr-bar" onclick="openAddr()">
-    <span id="hdrAddr">📍 Add Delivery Address in Makrana</span>
-    <span style="color:#16A34A;font-weight:800;">Edit ▾</span>
-  </div>
-  <input type="text" id="searchBox" class="search" placeholder="Search items..." oninput="renderItems()">
+  <div class="top"><div class="logo">GO-GROC ⚡</div><div id="stPill" class="pill">● OPEN</div></div>
+  <div class="addr" onclick="openAddr()"><span id="hdrAddr">📍 Add Delivery Address in Makrana</span><span style="color:#16A34A;font-weight:800">Edit ▾</span></div>
+  <input type="text" id="sBox" class="search" placeholder="Search items..." oninput="renderItems()">
 </header>
 
 <div id="v-home" class="view active">
-  <div id="dealsWrap" style="display:none;">
-    <div class="sec-head"><span class="sec-title">🔥 Today's Deals</span></div>
-    <div id="dealsRow" class="cat-strip"></div>
-  </div>
-  <div class="sec-head">
-    <span class="sec-title">Shop by Category</span>
-    <span class="sec-link" onclick="goTab('cat')">See all →</span>
-  </div>
-  <div id="catStrip" class="cat-strip"></div>
-  <div class="sec-head">
-    <span id="gridTitle" class="sec-title">All Fresh Items</span>
-    <span id="showAllBtn" class="sec-link" style="display:none;" onclick="setCat('All')">Show All</span>
-  </div>
-  <div id="itemsGrid" class="grid">
-    <p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px;">Loading store items...</p>
-  </div>
+  <div class="head"><b>Shop by Category</b><span style="font-size:12px;font-weight:700;color:#16A34A;cursor:pointer" onclick="goTab('cat')">See all →</span></div>
+  <div id="catStrip" class="strip"></div>
+  <div class="head"><b id="gTitle">All Fresh Items</b><span id="allBtn" style="display:none;font-size:12px;font-weight:700;color:#16A34A;cursor:pointer" onclick="setCat('All')">Show All</span></div>
+  <div id="iGrid" class="grid"><p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px">Loading items...</p></div>
 </div>
 
 <div id="v-cat" class="view">
-  <div class="sec-head"><span class="sec-title">All Categories</span></div>
-  <div id="catGrid" class="cat-grid"></div>
+  <div class="head"><b>All Categories</b></div>
+  <div id="cGrid" class="grid"></div>
 </div>
 
 <div id="v-wish" class="view">
-  <div class="sec-head"><span class="sec-title">🔖 Saved Wishlist</span></div>
-  <div id="wishGrid" class="grid"></div>
+  <div class="head"><b>🔖 Saved Wishlist</b></div>
+  <div id="wGrid" class="grid"></div>
 </div>
 
 <div id="v-orders" class="view">
   <div class="box">
-    <div style="font-size:12px;font-weight:700;margin-bottom:6px;">Track Orders & Invoices by Mobile</div>
-    <div style="display:flex;gap:8px;">
-      <input type="tel" id="trackPhone" class="inp" style="margin:0;" placeholder="10-digit mobile number">
-      <button onclick="trackByPhone()" style="background:#16A34A;color:#fff;border:none;padding:0 16px;border-radius:10px;font-weight:800;">Track</button>
-    </div>
+    <div style="font-size:12px;font-weight:700;margin-bottom:6px">Track Orders & Invoices</div>
+    <div style="display:flex;gap:8px"><input type="tel" id="tPhone" class="inp" style="margin:0" placeholder="10-digit mobile"><button onclick="trackPhone()" style="background:#16A34A;color:#fff;border:none;padding:0 16px;border-radius:10px;font-weight:800">Track</button></div>
   </div>
-  <div id="ordersList"></div>
+  <div id="oList"></div>
 </div>
 
-<div id="cartBar" class="cart-bar" onclick="openCart()">
-  <div>
-    <div id="cartTxt1" style="font-size:13px;font-weight:800;">0 Items</div>
-    <div id="cartTxt2" style="font-size:11px;">Min order ₹99</div>
-  </div>
-  <div style="font-weight:800;">View Cart →</div>
+<div id="cBar" class="cbar" onclick="openCart()">
+  <div><div id="cTxt1" style="font-size:13px;font-weight:800">0 Items</div><div id="cTxt2" style="font-size:11px">Min order ₹99</div></div>
+  <div style="font-weight:800">View Cart →</div>
 </div>
 
 <nav class="nav">
-  <div id="n-home" class="nav-btn active" onclick="goTab('home')"><div style="font-size:18px;">🏠</div>Home</div>
-  <div id="n-cat" class="nav-btn" onclick="goTab('cat')"><div style="font-size:18px;">📦</div>Categories</div>
-  <div id="n-wish" class="nav-btn" onclick="goTab('wish')"><div style="font-size:18px;">🔖</div>Wishlist</div>
-  <div id="n-orders" class="nav-btn" onclick="goTab('orders')"><div style="font-size:18px;">🛵</div>Orders</div>
+  <div id="n-home" class="nbtn active" onclick="goTab('home')"><div style="font-size:18px">🏠</div>Home</div>
+  <div id="n-cat" class="nbtn" onclick="goTab('cat')"><div style="font-size:18px">📦</div>Categories</div>
+  <div id="n-wish" class="nbtn" onclick="goTab('wish')"><div style="font-size:18px">🔖</div>Wishlist</div>
+  <div id="n-orders" class="nbtn" onclick="goTab('orders')"><div style="font-size:18px">🛵</div>Orders</div>
 </nav>
 
 <div id="cartModal" class="modal">
-  <div class="m-top">
-    <button onclick="closeCart()" style="font-size:20px;border:none;background:none;font-weight:800;">←</button>
-    <b>Your Cart (Min ₹99 + ₹30 Delivery)</b>
-  </div>
-  <div class="box" id="cartList"></div>
+  <div class="mtop"><button onclick="closeCart()" style="font-size:20px;border:none;background:none;font-weight:800">←</button><b>Your Cart (Min ₹99 + ₹30 Delivery)</b></div>
+  <div class="box" id="cList"></div>
+  <div class="box"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><b>📍 Delivery Address</b><span onclick="openAddr()" style="color:#16A34A;font-weight:800;cursor:pointer">Edit</span></div><div id="cAddr" style="font-size:13px;color:#475569">No address saved</div></div>
   <div class="box">
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><b>📍 Delivery Address</b><span onclick="openAddr()" style="color:#16A34A;font-weight:800;cursor:pointer;">Edit</span></div>
-    <div id="cartAddr" style="font-size:13px;color:#475569;">No address saved</div>
+    <div class="irow"><span>Item Total</span><span id="bItem">₹0</span></div>
+    <div class="irow"><span>Delivery Charge</span><span>₹30</span></div>
+    <div class="irow" style="font-weight:900;font-size:16px;border-top:1px solid #E2E8F0;padding-top:8px;margin-top:4px"><span>To Pay (COD)</span><span id="bTot">₹0</span></div>
   </div>
-  <div class="box">
-    <div class="inv-row"><span>Item Total</span><span id="bItem">₹0</span></div>
-    <div class="inv-row"><span>Delivery Charge</span><span>₹30</span></div>
-    <div class="inv-row" style="font-weight:900;font-size:16px;border-top:1px solid #E2E8F0;padding-top:8px;margin-top:4px;"><span>To Pay (COD)</span><span id="bTotal">₹0</span></div>
-  </div>
-  <div class="cta"><button id="orderBtn" class="btn-main" onclick="placeOrder()">Place COD Order</button></div>
+  <div class="cta"><button id="oBtn" class="bmain" onclick="placeOrder()">Place COD Order</button></div>
 </div>
 
-<div id="addrModal" class="modal" style="z-index:350;">
-  <div class="m-top">
-    <button onclick="closeAddr()" style="font-size:20px;border:none;background:none;font-weight:800;">←</button>
-    <b>Delivery Address</b>
-  </div>
+<div id="addrModal" class="modal" style="z-index:350">
+  <div class="mtop"><button onclick="closeAddr()" style="font-size:20px;border:none;background:none;font-weight:800">←</button><b>Delivery Address</b></div>
   <div class="box">
     <input type="text" id="aHouse" class="inp" placeholder="House / Flat No. *">
     <input type="text" id="aLand" class="inp" placeholder="Landmark / Street *">
     <input type="text" id="aArea" class="inp" value="Makrana, Rajasthan">
     <input type="text" id="aName" class="inp" placeholder="Receiver Name *">
-    <input type="tel" id="aPhone" class="inp" placeholder="10-digit Mobile Number *">
+    <input type="tel" id="aPhone" class="inp" placeholder="10-digit Mobile *">
   </div>
-  <div class="cta"><button class="btn-main" onclick="saveAddr()">Save Address</button></div>
+  <div class="cta"><button class="bmain" onclick="saveAddr()">Save Address</button></div>
 </div>
 
 <script>
-var FEE = 30;
-var CATS = [
-  { n: "Vegetables & Fruits", i: "🥦" },
-  { n: "Dairy & Bread", i: "🥛" },
-  { n: "Atta, Rice & Dal", i: "🌾" },
-  { n: "Snacks & Drinks", i: "🍟" },
-  { n: "Fast Food", i: "🍔" },
-  { n: "Daily Essentials", i: "🧴" }
-];
+var FEE=30,CATS=[{n:"Vegetables & Fruits",i:"🥦"},{n:"Dairy & Bread",i:"🥛"},{n:"Atta, Rice & Dal",i:"🌾"},{n:"Snacks & Drinks",i:"🍟"},{n:"Fast Food",i:"🍔"},{n:"Daily Essentials",i:"🧴"}];
+function rJ(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+var db=null,items=[],orders=[],loaded=false,isOpen=true,curCat="All",cart=rJ("gg_cart",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
 
-function loadJSON(k, d) {
-  try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; }
-}
-
-var db = null, items = [], orders = [], loaded = false, isOpen = true, curCat = "All";
-var cart = loadJSON("gg_cart", {});
-var wish = loadJSON("gg_wish", []);
-var prof = loadJSON("gg_prof", null);
-
-function initUI() {
-  var s = document.getElementById("catStrip");
-  var g = document.getElementById("catGrid");
-  CATS.forEach(function(c) {
-    var d1 = document.createElement("div");
-    d1.className = "cat-chip";
-    d1.setAttribute("data-c", c.n);
-    d1.innerHTML = "<div class='cat-icon'>" + c.i + "</div><div class='cat-label'>" + c.n + "</div>";
-    d1.onclick = function() { setCat(c.n); };
-    s.appendChild(d1);
-
-    var d2 = document.createElement("div");
-    d2.className = "cat-card";
-    d2.innerHTML = "<div style='font-size:34px;margin-bottom:6px;'>" + c.i + "</div><b>" + c.n + "</b>";
-    d2.onclick = function() { setCat(c.n); goTab("home"); };
-    g.appendChild(d2);
+function initUI(){
+  var s=document.getElementById("catStrip"),g=document.getElementById("cGrid");
+  CATS.forEach(function(c){
+    var d1=document.createElement("div");d1.className="chip";d1.setAttribute("data-c",c.n);
+    d1.innerHTML="<div class='cicon'>"+c.i+"</div><div class='clbl'>"+c.n+"</div>";
+    d1.onclick=function(){setCat(c.n)};s.appendChild(d1);
+    var d2=document.createElement("div");d2.className="card";d2.style.cssText="padding:16px;text-align:center;cursor:pointer";
+    d2.innerHTML="<div style='font-size:34px;margin-bottom:6px'>"+c.i+"</div><b>"+c.n+"</b>";
+    d2.onclick=function(){setCat(c.n);goTab("home")};g.appendChild(d2);
   });
   syncProf();
 }
-
-function syncProf() {
-  if (!prof) return;
-  document.getElementById("hdrAddr").textContent = "📍 " + prof.house + ", " + prof.land;
-  document.getElementById("cartAddr").innerHTML = "<b>" + prof.name + " (" + prof.phone + ")</b><br>" + prof.house + ", " + prof.land + ", " + prof.area;
-  document.getElementById("aHouse").value = prof.house || "";
-  document.getElementById("aLand").value = prof.land || "";
-  document.getElementById("aArea").value = prof.area || "Makrana, Rajasthan";
-  document.getElementById("aName").value = prof.name || "";
-  document.getElementById("aPhone").value = prof.phone || "";
-  document.getElementById("trackPhone").value = prof.phone || "";
+function syncProf(){
+  if(!prof)return;
+  document.getElementById("hdrAddr").textContent="📍 "+prof.house+", "+prof.land;
+  document.getElementById("cAddr").innerHTML="<b>"+prof.name+" ("+prof.phone+")</b><br>"+prof.house+", "+prof.land+", "+prof.area;
+  document.getElementById("aHouse").value=prof.house||"";
+  document.getElementById("aLand").value=prof.land||"";
+  document.getElementById("aArea").value=prof.area||"Makrana, Rajasthan";
+  document.getElementById("aName").value=prof.name||"";
+  document.getElementById("aPhone").value=prof.phone||"";
+  document.getElementById("tPhone").value=prof.phone||"";
 }
-
-function goTab(t) {
-  ["home", "cat", "wish", "orders"].forEach(function(x) {
-    document.getElementById("v-" + x).className = (x === t) ? "view active" : "view";
-    document.getElementById("n-" + x).className = (x === t) ? "nav-btn active" : "nav-btn";
+function goTab(t){
+  ["home","cat","wish","orders"].forEach(function(x){
+    document.getElementById("v-"+x).className=(x===t)?"view active":"view";
+    document.getElementById("n-"+x).className=(x===t)?"nbtn active":"nbtn";
   });
-  if (t === "wish") renderWish();
-  if (t === "orders") renderOrders();
+  if(t==="wish")renderWish();if(t==="orders")renderOrders();
 }
-
-function setCat(c) {
-  curCat = c;
-  document.querySelectorAll(".cat-chip").forEach(function(el) {
-    el.classList.toggle("active", el.getAttribute("data-c") === c);
-  });
-  document.getElementById("gridTitle").textContent = c === "All" ? "All Fresh Items" : c;
-  document.getElementById("showAllBtn").style.display = c === "All" ? "none" : "inline";
+function setCat(c){
+  curCat=c;
+  document.querySelectorAll(".chip").forEach(function(el){el.classList.toggle("active",el.getAttribute("data-c")===c)});
+  document.getElementById("gTitle").textContent=c==="All"?"All Fresh Items":c;
+  document.getElementById("allBtn").style.display=c==="All"?"none":"inline";
   renderItems();
 }
-
-function makeCard(it) {
-  var q = cart[it.id] || 0;
-  var ok = it.inStock !== false;
-  var w = wish.indexOf(it.id) !== -1;
-  var deal = it.mrp && Number(it.mrp) > Number(it.price);
-
-  var card = document.createElement("div");
-  card.className = "card";
-
-  var wb = document.createElement("div");
-  wb.className = "wish-btn";
-  wb.textContent = w ? "❤️" : "🔖";
-  wb.onclick = function() {
-    var idx = wish.indexOf(it.id);
-    if (idx !== -1) wish.splice(idx, 1); else wish.push(it.id);
-    localStorage.setItem("gg_wish", JSON.stringify(wish));
-    renderAll();
-  };
+function makeCard(it){
+  var q=cart[it.id]||0,ok=it.inStock!==false,w=wish.indexOf(it.id)!==-1,deal=it.mrp&&Number(it.mrp)>Number(it.price);
+  var card=document.createElement("div");card.className="card";
+  var wb=document.createElement("div");wb.className="wbtn";wb.textContent=w?"❤️":"🔖";
+  wb.onclick=function(){var idx=wish.indexOf(it.id);if(idx!==-1)wish.splice(idx,1);else wish.push(it.id);localStorage.setItem("gg_wish",JSON.stringify(wish));renderAll()};
   card.appendChild(wb);
-
-  var ib = document.createElement("div");
-  ib.className = "img-box";
-  if (it.image && it.image.length > 10) {
-    var img = document.createElement("img"); img.src = it.image; ib.appendChild(img);
-  } else {
-    ib.textContent = it.emoji || "🛒";
-  }
+  var ib=document.createElement("div");ib.className="ibox";
+  if(it.image&&it.image.length>10){var img=document.createElement("img");img.src=it.image;ib.appendChild(img)}else{ib.textContent=it.emoji||"🛒"}
   card.appendChild(ib);
-
-  var bd = document.createElement("div");
-  bd.className = "c-body";
-  bd.innerHTML = "<div class='c-cat'>" + (it.category || "Grocery") + "</div><div class='c-name'>" + it.name + "</div><div class='c-desc'>" + (it.desc || "") + "</div>";
-
-  var pr = document.createElement("div");
-  pr.className = "p-row";
-  pr.innerHTML = "<div>" + (deal ? "<span class='mrp'>₹" + it.mrp + "</span>" : "") + "<span class='price'>₹" + it.price + "</span></div>";
-
-  if (!ok) {
-    pr.innerHTML += "<span style='font-size:11px;color:#DC2626;font-weight:700;'>Out of Stock</span>";
-  } else if (q === 0) {
-    var b = document.createElement("button"); b.className = "btn-add"; b.textContent = "ADD";
-    b.onclick = function() { addQty(it.id, 1); };
-    pr.appendChild(b);
-  } else {
-    var qb = document.createElement("div"); qb.className = "qty-box";
-    var b1 = document.createElement("button"); b1.textContent = "−"; b1.onclick = function() { addQty(it.id, -1); };
-    var sp = document.createElement("span"); sp.textContent = q;
-    var b2 = document.createElement("button"); b2.textContent = "+"; b2.onclick = function() { addQty(it.id, 1); };
-    qb.appendChild(b1); qb.appendChild(sp); qb.appendChild(b2);
-    pr.appendChild(qb);
+  var bd=document.createElement("div");bd.className="cbd";
+  bd.innerHTML="<div class='ccat'>"+(it.category||"Grocery")+"</div><div class='cname'>"+it.name+"</div><div class='cdesc'>"+(it.desc||"")+"</div>";
+  var pr=document.createElement("div");pr.className="prow";
+  pr.innerHTML="<div>"+(deal?"<span class='mrp'>₹"+it.mrp+"</span>":"")+"<span class='price'>₹"+it.price+"</span></div>";
+  if(!ok){pr.innerHTML+="<span style='font-size:11px;color:#DC2626;font-weight:700'>Out of Stock</span>"}
+  else if(q===0){var b=document.createElement("button");b.className="badd";b.textContent="ADD";b.onclick=function(){addQty(it.id,1)};pr.appendChild(b)}
+  else{
+    var qb=document.createElement("div");qb.className="qbox";
+    var b1=document.createElement("button");b1.textContent="−";b1.onclick=function(){addQty(it.id,-1)};
+    var sp=document.createElement("span");sp.textContent=q;
+    var b2=document.createElement("button");b2.textContent="+";b2.onclick=function(){addQty(it.id,1)};
+    qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);pr.appendChild(qb);
   }
-  bd.appendChild(pr);
-  card.appendChild(bd);
-  return card;
+  bd.appendChild(pr);card.appendChild(bd);return card;
 }
-
-function renderItems() {
-  if (!loaded) return;
-  var q = document.getElementById("searchBox").value.toLowerCase();
-  var grid = document.getElementById("itemsGrid");
-  grid.innerHTML = "";
-  var list = items.filter(function(i) {
-    return (i.name || "").toLowerCase().indexOf(q) !== -1 && (curCat === "All" || (i.category || "Daily Essentials") === curCat);
-  });
-  if (!list.length) {
-    grid.innerHTML = "<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px;'>No items found</p>";
-    return;
+function renderItems(){
+  if(!loaded)return;
+  var q=document.getElementById("sBox").value.toLowerCase(),grid=document.getElementById("iGrid");grid.innerHTML="";
+  var list=items.filter(function(i){return(i.name||"").toLowerCase().indexOf(q)!==-1&&(curCat==="All"||(i.category||"Daily Essentials")===curCat)});
+  if(!list.length){grid.innerHTML="<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px'>No items found</p>";return}
+  list.forEach(function(it){grid.appendChild(makeCard(it))});
+}
+function renderWish(){
+  var grid=document.getElementById("wGrid");grid.innerHTML="";
+  var list=items.filter(function(i){return wish.indexOf(i.id)!==-1});
+  if(!list.length){grid.innerHTML="<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px'>Wishlist is empty</p>";return}
+  list.forEach(function(it){grid.appendChild(makeCard(it))});
+}
+function addQty(id,d){
+  if(!isOpen){alert("Store is closed!");return}
+  cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];
+  localStorage.setItem("gg_cart",JSON.stringify(cart));renderAll();
+  if(document.getElementById("cartModal").style.display==="flex")renderCart();
+}
+function totals(){
+  var c=0,sub=0;
+  for(var id in cart){var it=items.find(function(x){return x.id===id});if(it){c+=cart[id];sub+=Number(it.price)*cart[id]}}
+  return{c:c,sub:sub,tot:sub+FEE};
+}
+function renderAll(){
+  renderItems();renderWish();
+  var t=totals(),bar=document.getElementById("cBar");
+  if(t.c===0){bar.style.display="none";closeCart();return}
+  bar.style.display="flex";
+  document.getElementById("cTxt1").textContent=t.c+" Items | ₹"+t.sub+" (+ ₹"+FEE+" Delivery)";
+  if(t.sub<99){bar.classList.add("locked");document.getElementById("cTxt2").textContent="Add ₹"+(99-t.sub)+" more (Min ₹99)"}
+  else{bar.classList.remove("locked");document.getElementById("cTxt2").textContent="✓ Total ₹"+t.tot+" • Tap to order"}
+}
+function openCart(){renderCart();document.getElementById("cartModal").style.display="flex"}
+function closeCart(){document.getElementById("cartModal").style.display="none"}
+function renderCart(){
+  var t=totals(),box=document.getElementById("cList");box.innerHTML="";
+  for(var id in cart){
+    var it=items.find(function(x){return x.id===id});if(!it)continue;
+    var row=document.createElement("div");row.style.cssText="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F1F5F9";
+    row.innerHTML="<div><b>"+it.name+"</b><div style='font-size:12px;color:#64748B'>₹"+it.price+" × "+cart[id]+" = ₹"+(it.price*cart[id])+"</div></div>";
+    var qb=document.createElement("div");qb.className="qbox";
+    (function(iid,q){
+      var b1=document.createElement("button");b1.textContent="−";b1.onclick=function(){addQty(iid,-1)};
+      var sp=document.createElement("span");sp.textContent=q;
+      var b2=document.createElement("button");b2.textContent="+";b2.onclick=function(){addQty(iid,1)};
+      qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);
+    })(id,cart[id]);
+    row.appendChild(qb);box.appendChild(row);
   }
-  list.forEach(function(it) { grid.appendChild(makeCard(it)); });
+  document.getElementById("bItem").textContent="₹"+t.sub;
+  document.getElementById("bTot").textContent="₹"+t.tot;
+  var btn=document.getElementById("oBtn");
+  if(t.sub<99){btn.disabled=true;btn.textContent="Add ₹"+(99-t.sub)+" more (Min ₹99)"}
+  else if(!prof){btn.disabled=false;btn.textContent="Add Address to Order"}
+  else{btn.disabled=false;btn.textContent="Place COD Order • ₹"+t.tot}
 }
-
-function renderWish() {
-  var grid = document.getElementById("wishGrid");
-  grid.innerHTML = "";
-  var list = items.filter(function(i) { return wish.indexOf(i.id) !== -1; });
-  if (!list.length) {
-    grid.innerHTML = "<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px;'>Wishlist is empty</p>";
-    return;
-  }
-  list.forEach(function(it) { grid.appendChild(makeCard(it)); });
+function openAddr(){document.getElementById("addrModal").style.display="flex"}
+function closeAddr(){document.getElementById("addrModal").style.display="none"}
+function saveAddr(){
+  var h=document.getElementById("aHouse").value.trim(),l=document.getElementById("aLand").value.trim(),a=document.getElementById("aArea").value.trim(),n=document.getElementById("aName").value.trim(),p=document.getElementById("aPhone").value.trim();
+  if(!h||!l||!n||!p){alert("Fill all fields!");return}
+  prof={house:h,land:l,area:a,name:n,phone:p};localStorage.setItem("gg_prof",JSON.stringify(prof));
+  syncProf();closeAddr();if(document.getElementById("cartModal").style.display==="flex")renderCart();
 }
-
-function addQty(id, d) {
-  if (!isOpen) { alert("Store is closed!"); return; }
-  cart[id] = (cart[id] || 0) + d;
-  if (cart[id] <= 0) delete cart[id];
-  localStorage.setItem("gg_cart", JSON.stringify(cart));
-  renderAll();
-  if (document.getElementById("cartModal").style.display === "flex") renderCart();
+function placeOrder(){
+  var t=totals();if(t.sub<99)return;if(!prof){openAddr();return}if(!db){alert("Connecting...");return}
+  var btn=document.getElementById("oBtn");btn.disabled=true;btn.textContent="Placing...";
+  var list=[];for(var id in cart){var it=items.find(function(x){return x.id===id});if(it)list.push({name:it.name,qty:cart[id],price:Number(it.price)})}
+  db.collection("orders").add({
+    customerName:prof.name,phone:prof.phone,address:prof.house+", "+prof.land+", "+prof.area,
+    items:list,itemTotal:t.sub,deliveryCharge:FEE,total:t.tot,status:"Placed",createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(ref){
+    var ids=rJ("gg_oids",[]);ids.unshift(ref.id);localStorage.setItem("gg_oids",JSON.stringify(ids.slice(0,15)));
+    cart={};localStorage.setItem("gg_cart","{}");renderAll();closeCart();goTab("orders");
+  }).catch(function(e){alert(e.message);btn.disabled=false;renderCart()});
 }
-
-function totals() {
-  var c = 0, sub = 0;
-  for (var id in cart) {
-    var it = items.find(function(x) { return x.id === id; });
-    if (it) { c += cart[id]; sub += Number(it.price) * cart[id]; }
-  }
-  return { c: c, sub: sub, tot: sub + FEE };
+function trackPhone(){
+  var p=document.getElementById("tPhone").value.trim();
+  if(p){prof=Object.assign({},prof||{},{phone:p});localStorage.setItem("gg_prof",JSON.stringify(prof))}
+  renderOrders();
 }
-
-function renderAll() {
-  renderItems();
-  renderWish();
-  var t = totals();
-  var bar = document.getElementById("cartBar");
-  if (t.c === 0) { bar.style.display = "none"; closeCart(); return; }
-  bar.style.display = "flex";
-  document.getElementById("cartTxt1").textContent = t.c + " Items | ₹" + t.sub + " (+ ₹" + FEE + " Delivery)";
-  if (t.sub < 99) {
-    bar.classList.add("locked");
-    document.getElementById("cartTxt2").textContent = "Add ₹" + (99 - t.sub) + " more (Min ₹99)";
-  } else {
-    bar.classList.remove("locked");
-    document.getElementById("cartTxt2").textContent = "✓ Total ₹" + t.tot + " • Tap to order";
-  }
+function renderOrders(){
+  var pq=(document.getElementById("tPhone").value||"").replace(/\D/g,"").slice(-10),ids=rJ("gg_oids",[]);
+  var list=orders.filter(function(o){var op=(o.phone||"").replace(/\D/g,"").slice(-10);return(pq&&op===pq)||ids.indexOf(o.id)!==-1});
+  var box=document.getElementById("oList");
+  if(!list.length){box.innerHTML="<p style='text-align:center;color:#64748B;padding:30px'>No orders yet.</p>";return}
+  box.innerHTML=list.map(function(o){
+    var sub=0,rows=(o.items||[]).map(function(i){var amt=Number(i.price)*Number(i.qty);sub+=amt;return"<div class='irow'><span>"+i.qty+"x "+i.name+" (₹"+i.price+")</span><b>₹"+amt+"</b></div>"}).join("");
+    var iSub=o.itemTotal||sub,del=(typeof o.deliveryCharge==="number")?o.deliveryCharge:(Number(o.total)-iSub>0?Number(o.total)-iSub:0);
+    return"<div class='box'><div style='display:flex;justify-content:space-between;margin-bottom:6px'><b>#"+o.id.slice(0,6).toUpperCase()+"</b><span class='pill'>"+(o.status||"Placed")+"</span></div><div class='ibox2'>"+rows+"<div class='irow' style='border-top:1px dashed #CBD5E1;margin-top:4px;padding-top:4px'><span>Delivery Charge</span><span>₹"+del+"</span></div><div class='irow' style='font-weight:900;color:#16A34A'><span>Grand Total (COD)</span><span>₹"+o.total+"</span></div></div><div style='font-size:12px;color:#64748B'>📍 "+(o.address||"")+"</div></div>";
+  }).join("");
 }
-
-function openCart() { renderCart(); document.getElementById("cartModal").style.display = "flex"; }
-function closeCart() { document.getElementById("cartModal").style.display = "none"; }
-
-function renderCart() {
-  var t = totals();
-  var box = document.getElementById("cartList");
-  box.innerHTML = "";
-  for (var id in cart) {
-    var it = items.find(function(x) { return x.id === id; });
-    if (!it) continue;
-    var row = document.createElement("div");
-    row.style.cssText = "display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F1F5F9;";
-    row.innerHTML = "<div><b>" + it.name + "</b><div style='font-size:12px;color:#64748B;'>₹" + it.price + " × " + cart[id] + " = ₹" + (it.price * cart[id]) + "</div></div>";
-    var qb = document.createElement("div"); qb.className = "qty-box";
-    (function(iid, q) {
-      var b1 = document.createElement("button"); b1.textContent = "−"; b1.onclick = function() { addQty(iid, -1); };
-      var sp = document.createElement("span"); sp.textContent = q;
-      var b2 = document.createElement("button"); b2.textContent = "+"; b2.onclick = function() { addQty(iid, 1); };
-      qb.appendChild(b1); qb.appendChild(sp); qb.appendChild(b2);
-    })(id, cart[id]);
-    row.appendChild(qb);
-    box.appendChild(row);
-  }
-  document.getElementById("bItem").textContent = "₹" + t.sub;
-  document.getElementById("bTotal").textContent = "₹" + t.tot;
-  var btn = document.getElementById("orderBtn");
-  if (t.sub < 99) { btn.disabled = true; btn.textContent = "Add ₹" + (99 - t.sub) + " more (Min ₹99)"; }
-  else if (!prof) { btn.disabled = false; btn.textContent = "Add Address to Order"; }
-  else { btn.disabled = false; btn.textContent = "Place COD Order • ₹" + t.tot; }
-}
-
-function openAddr() { document.getElementById("addrModal").style.display = "flex"; }
-function closeAddr() { document.getElementById("addrModal").style.display = "none"; }
-
-function saveAddr() {
-  var h = document.getElementById("aHouse").value.trim();
-  var l = document.getElementById("aLand").value.trim();
-  var a = document.getElementById("aArea").value.trim();
-  var n = document.getElementById("aName").value.trim();
-  var p = document.getElementById("aPhone").value.trim();
-  if (!h || !l || !n || !p) { alert("Fill all fields!"); return; }
-  prof = { house: h, land: l, area: a, name: n, phone: p };
-  localStorage.setItem("gg_prof", JSON.stringify(prof));
-  syncProf();
-  closeAddr();
-  if (document.getElementById("cartModal").style.display === "flex") renderCart();
-}
-
-function placeOrder() {
-  var t = totals();
-  if (t.sub < 99) return;
-  if (!prof) { openAddr(); 
+initUI();
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+try{
+  firebase.initializeApp({projectId:"go-groc-f488d"});db=firebase.firestore();
+  db.collection("settings").doc("store").onSnapshot(function(s){
