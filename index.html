@@ -79,13 +79,24 @@
   .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: #FFFFFF; padding: 12px 14px; border-top: 1px solid #E2E8F0; z-index: 320; }
   .btn-green { width: 100%; background: #16A34A; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; }
   .btn-green:disabled { background: #94A3B8; cursor: not-allowed; }
-  .order-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin: 12px; }
-  .progress-track { display: flex; justify-content: space-between; position: relative; margin: 14px 0 10px; }
+  .order-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+  .progress-track { display: flex; justify-content: space-between; position: relative; margin: 14px 0 12px; }
   .progress-track::before { content: ""; position: absolute; top: 9px; left: 12%; right: 12%; height: 3px; background: #E2E8F0; z-index: 1; }
   .step { position: relative; z-index: 2; text-align: center; width: 33.3%; font-size: 11px; color: #94A3B8; font-weight: 600; }
   .step-dot { width: 20px; height: 20px; border-radius: 50%; background: #E2E8F0; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
   .step.active { color: #16A34A; font-weight: 800; }
   .step.active .step-dot { background: #16A34A; }
+
+  /* Invoice Box inside Order Card */
+  .invoice-box { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
+  .inv-header { font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px dashed #CBD5E1; padding-bottom: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .inv-row { display: flex; justify-content: space-between; align-items: flex-start; font-size: 13px; color: #1E293B; padding: 4px 0; gap: 10px; }
+  .inv-item-name { flex: 1; line-height: 1.3; }
+  .inv-item-rate { font-size: 11px; color: #64748B; display: block; }
+  .inv-item-amt { font-weight: 700; white-space: nowrap; color: #0F172A; }
+  .inv-summary { border-top: 1px dashed #CBD5E1; margin-top: 6px; padding-top: 6px; }
+  .inv-sum-row { display: flex; justify-content: space-between; font-size: 12px; color: #475569; padding: 2px 0; }
+  .inv-total-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: 900; color: #16A34A; border-top: 1px solid #E2E8F0; margin-top: 4px; padding-top: 6px; }
 </style>
 </head>
 <body>
@@ -139,7 +150,7 @@
 
 <div id="viewOrders" class="view">
   <div class="box-card">
-    <label class="field-label">Track Orders by Mobile Number</label>
+    <label class="field-label">Track Orders & Invoices by Mobile Number</label>
     <div style="display:flex;gap:8px;">
       <input type="tel" id="trackPhoneInput" class="input-field" style="margin-bottom:0;" placeholder="Enter 10-digit mobile number">
       <button onclick="saveAndTrackPhone()" style="background:#16A34A;color:#fff;border:none;padding:0 16px;border-radius:10px;font-weight:800;">Track</button>
@@ -168,7 +179,7 @@
     <button class="back-btn" onclick="closeCartModal()">←</button>
     <div>
       <div style="font-size:16px;font-weight:800;">Your Cart</div>
-      <div style="font-size:11px;color:#16A34A;font-weight:700;">Minimum Order Value: ₹99</div>
+      <div style="font-size:11px;color:#16A34A;font-weight:700;">Minimum Order Value: ₹99 (+ ₹30 Delivery)</div>
     </div>
   </div>
   <div class="box-card">
@@ -184,7 +195,7 @@
   </div>
   <div class="box-card">
     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#475569;"><span>Item Total</span><span id="billItemTotal">₹0</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:#16A34A;font-weight:700;"><span>Delivery Charge</span><span>FREE (Above ₹99)</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:#0F172A;font-weight:700;"><span>Delivery Charge</span><span>₹30</span></div>
     <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1px solid #E2E8F0;padding-top:8px;"><span>To Pay (Cash on Delivery)</span><span id="billGrandTotal">₹0</span></div>
   </div>
   <div class="sticky-cta"><button id="cartProceedBtn" class="btn-green" onclick="handleCartProceed()">Add address to proceed</button></div>
@@ -231,10 +242,7 @@
 </div>
 
 <script>
-window.onerror = function(msg, src, line) {
-  var g = document.getElementById("itemsGrid");
-  if (g) g.innerHTML = "<p style='grid-column:span 2;color:red;padding:20px;'>JS Error: " + msg + " (Line " + line + ")</p>";
-};
+var DELIVERY_FEE = 30;
 
 function safeParse(k, f) {
   try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch (e) { return f; }
@@ -398,13 +406,13 @@ function updateQty(id, change) {
 }
 
 function getCartTotals() {
-  var count = 0, total = 0;
+  var count = 0, itemTotal = 0;
   for (var id in cart) {
     if (!cart.hasOwnProperty(id)) continue;
     var item = allItems.find(function(i) { return i.id === id; });
-    if (item) { count += cart[id]; total += Number(item.price) * cart[id]; }
+    if (item) { count += cart[id]; itemTotal += Number(item.price) * cart[id]; }
   }
-  return { count: count, total: total };
+  return { count: count, itemTotal: itemTotal, grandTotal: itemTotal + DELIVERY_FEE };
 }
 
 function updateCartUI() {
@@ -416,13 +424,13 @@ function updateCartUI() {
     return;
   }
   bar.style.display = "flex";
-  document.getElementById("cartFloatTitle").textContent = res.count + " Item" + (res.count > 1 ? "s" : "") + " | ₹" + res.total;
-  if (res.total < 99) {
+  document.getElementById("cartFloatTitle").textContent = res.count + " Item" + (res.count > 1 ? "s" : "") + " | ₹" + res.itemTotal + " (+ ₹" + DELIVERY_FEE + " Delivery)";
+  if (res.itemTotal < 99) {
     bar.classList.add("locked");
-    document.getElementById("cartFloatSub").textContent = "Add ₹" + (99 - res.total) + " more (Min order ₹99)";
+    document.getElementById("cartFloatSub").textContent = "Add ₹" + (99 - res.itemTotal) + " more (Min order ₹99)";
   } else {
     bar.classList.remove("locked");
-    document.getElementById("cartFloatSub").textContent = "✓ Minimum ₹99 unlocked • Free Delivery";
+    document.getElementById("cartFloatSub").textContent = "✓ Minimum ₹99 unlocked • Total ₹" + res.grandTotal;
   }
 }
 
@@ -441,16 +449,16 @@ function renderFullCart() {
     html += '<div class="cart-row"><div class="cart-row-info"><div style="font-size:14px;font-weight:700;">' + item.name + '</div><div style="font-size:13px;font-weight:800;color:#0F172A;margin-top:2px;">₹' + (item.price * qty) + ' <span style="font-size:11px;color:#64748B;font-weight:500;">(₹' + item.price + ' each)</span></div><button class="cart-wish-btn" onclick="toggleWishlist(\'' + id + '\')">' + (isWished ? "❤️ Saved in Wishlist" : "🔖 Save to Wishlist") + '</button></div><div class="qty-box"><button onclick="updateQty(\'' + id + '\', -1)">−</button><span>' + qty + '</span><button onclick="updateQty(\'' + id + '\', 1)">+</button></div></div>';
   }
   document.getElementById("fullCartList").innerHTML = html;
-  document.getElementById("billItemTotal").textContent = "₹" + res.total;
-  document.getElementById("billGrandTotal").textContent = "₹" + res.total;
+  document.getElementById("billItemTotal").textContent = "₹" + res.itemTotal;
+  document.getElementById("billGrandTotal").textContent = "₹" + res.grandTotal;
   var btn = document.getElementById("cartProceedBtn");
-  if (res.total < 99) { btn.disabled = true; btn.textContent = "Add ₹" + (99 - res.total) + " more (Minimum Order ₹99)"; }
+  if (res.itemTotal < 99) { btn.disabled = true; btn.textContent = "Add ₹" + (99 - res.itemTotal) + " more (Minimum Order ₹99)"; }
   else if (!savedProfile || !savedProfile.house) { btn.disabled = false; btn.textContent = "Add address to proceed"; }
-  else { btn.disabled = false; btn.textContent = "Place COD Order • ₹" + res.total; }
+  else { btn.disabled = false; btn.textContent = "Place COD Order • ₹" + res.grandTotal; }
 }
 
 function handleCartProceed() {
-  if (getCartTotals().total < 99) return;
+  if (getCartTotals().itemTotal < 99) return;
   if (!savedProfile || !savedProfile.house) openAddressModal(true); else submitOrder();
 }
 
@@ -501,7 +509,7 @@ function saveAddressAndProceed() {
 
 function submitOrder() {
   var res = getCartTotals();
-  if (res.total < 99) return;
+  if (res.itemTotal < 99) return;
   if (!db) { alert("Connecting to server, please wait 2 seconds and tap again."); return; }
   var btn = document.getElementById("cartProceedBtn");
   btn.disabled = true; btn.textContent = "Placing Order...";
@@ -514,7 +522,8 @@ function submitOrder() {
   var fullAddress = "[" + savedProfile.tag + "] " + savedProfile.house + (savedProfile.floor ? ", Floor " + savedProfile.floor : "") + ", " + savedProfile.landmark + ", " + savedProfile.area;
   db.collection("orders").add({
     customerName: savedProfile.name, phone: savedProfile.phone, address: fullAddress,
-    doorPhoto: savedProfile.doorPhoto || "", items: orderItems, total: res.total,
+    doorPhoto: savedProfile.doorPhoto || "", items: orderItems,
+    itemTotal: res.itemTotal, deliveryCharge: DELIVERY_FEE, total: res.grandTotal,
     status: "Placed", createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then(function(docRef) {
     var savedIds = safeParse("gogroc_order_ids", []);
@@ -542,12 +551,48 @@ function renderOrders() {
   badge.style.display = myOrders.some(function(o) { return ["Delivered", "Completed", "Cancelled"].indexOf(o.status) === -1; }) ? "inline-block" : "none";
   var container = document.getElementById("ordersList");
   if (!myOrders.length) { container.innerHTML = '<p style="text-align:center;color:#64748B;padding:30px 0;">No orders placed yet.</p>'; return; }
+
   container.innerHTML = myOrders.map(function(o) {
     var st = (o.status || "Placed").toLowerCase();
     var step2 = st.indexOf("prepar") !== -1 || st.indexOf("out") !== -1 || st.indexOf("deliver") !== -1 || st.indexOf("complet") !== -1;
     var step3 = st.indexOf("deliver") !== -1 || st.indexOf("complet") !== -1;
-    var itemsText = (o.items || []).map(function(i) { return i.qty + "x " + i.name; }).join(", ");
-    return '<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;color:#64748B;">ORDER #' + o.id.slice(0,6).toUpperCase() + '</span><span style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;background:#DCFCE7;color:#15803D;">' + (o.status || "Placed") + '</span></div><div class="progress-track"><div class="step active"><div class="step-dot">✓</div>Placed</div><div class="step ' + (step2 ? 'active' : '') + '"><div class="step-dot">' + (step2 ? '✓' : '2') + '</div>Out for Delivery</div><div class="step ' + (step3 ? 'active' : '') + '"><div class="step-dot">' + (step3 ? '✓' : '3') + '</div>Delivered</div></div><div style="font-size:13px;color:#1E293B;margin:8px 0;">' + itemsText + '</div><div style="font-size:12px;color:#64748B;border-top:1px solid #F1F5F9;padding-top:8px;display:flex;justify-content:space-between;"><span>📍 ' + (o.address || "") + '</span><b style="color:#16A34A;">₹' + o.total + '</b></div></div>';
+
+    var calcItemTotal = 0;
+    var invoiceRowsHtml = (o.items || []).map(function(i) {
+      var unitPrice = Number(i.price) || 0;
+      var qty = Number(i.qty) || 1;
+      var lineTotal = unitPrice * qty;
+      calcItemTotal += lineTotal;
+      return '<div class="inv-row">' +
+        '<div class="inv-item-name"><b>' + qty + 'x</b> ' + i.name + '<span class="inv-item-rate">₹' + unitPrice + ' × ' + qty + '</span></div>' +
+        '<div class="inv-item-amt">₹' + lineTotal + '</div>' +
+      '</div>';
+    }).join("");
+
+    var itemSub = o.itemTotal || calcItemTotal;
+    var delFee = (typeof o.deliveryCharge === "number") ? o.deliveryCharge : (Number(o.total) - itemSub > 0 ? Number(o.total) - itemSub : 0);
+
+    return '<div class="order-card">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+        '<span style="font-size:12px;font-weight:800;color:#64748B;">ORDER #' + o.id.slice(0,6).toUpperCase() + '</span>' +
+        '<span style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;background:#DCFCE7;color:#15803D;">' + (o.status || "Placed") + '</span>' +
+      '</div>' +
+      '<div class="progress-track">' +
+        '<div class="step active"><div class="step-dot">✓</div>Placed</div>' +
+        '<div class="step ' + (step2 ? 'active' : '') + '"><div class="step-dot">' + (step2 ? '✓' : '2') + '</div>Out for Delivery</div>' +
+        '<div class="step ' + (step3 ? 'active' : '') + '"><div class="step-dot">' + (step3 ? '✓' : '3') + '</div>Delivered</div>' +
+      '</div>' +
+      '<div class="invoice-box">' +
+        '<div class="inv-header"><span>🧾 Order Invoice</span><span>Item Total</span></div>' +
+        invoiceRowsHtml +
+        '<div class="inv-summary">' +
+          '<div class="inv-sum-row"><span>Items Subtotal</span><span>₹' + itemSub + '</span></div>' +
+          '<div class="inv-sum-row"><span>Delivery Charge</span><span>₹' + delFee + '</span></div>' +
+          '<div class="inv-total-row"><span>Grand Total (COD)</span><span>₹' + o.total + '</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#64748B;padding-top:4px;">📍 ' + (o.address || "") + '</div>' +
+    '</div>';
   }).join("");
 }
 
