@@ -29,7 +29,8 @@
   .deals-scroll::-webkit-scrollbar { display: none; }
   .deal-card { min-width: 145px; max-width: 145px; background: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%); border: 1px solid #DBEAFE; border-radius: 12px; padding: 8px; position: relative; flex-shrink: 0; }
   .deal-tag { position: absolute; top: 6px; left: 6px; background: #2563EB; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
-  .deal-card img { width: 100%; height: 82px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; background: #E2E8F0; }
+  .deal-emoji { width: 100%; height: 76px; background: #FFFFFF; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; font-size: 38px; overflow: hidden; }
+  .deal-emoji img { width: 100%; height: 100%; object-fit: cover; }
 
   .cat-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 14px 10px; scrollbar-width: none; }
   .cat-strip::-webkit-scrollbar { display: none; }
@@ -40,8 +41,9 @@
 
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 14px 14px; }
   .card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
-  .wish-icon { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.92); border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 5; }
-  .card img { width: 100%; height: 115px; object-fit: cover; background: #F1F5F9; }
+  .wish-icon { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.95); border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 5; }
+  .card-img-box { width: 100%; height: 110px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; font-size: 46px; overflow: hidden; }
+  .card-img-box img { width: 100%; height: 100%; object-fit: cover; }
   .card-body { padding: 10px; }
   .item-cat { font-size: 10px; font-weight: 700; color: #16A34A; text-transform: uppercase; margin-bottom: 2px; }
   .item-name { font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 3px; line-height: 1.3; }
@@ -118,7 +120,7 @@
 </header>
 
 <div id="viewHome" class="view active">
-  <div id="dealsSection" style="display:none;">
+  <div id="dealsSection">
     <div class="sec-head">
       <span class="sec-title">🔥 Today's Deals</span>
       <span style="font-size:11px;color:#2563EB;font-weight:700;">Best Prices</span>
@@ -136,9 +138,7 @@
     <span id="gridHeading" class="sec-title">All Fresh Items</span>
     <span id="clearFilterBtn" class="sec-link" style="display:none;" onclick="selectCategory('All')">Show All</span>
   </div>
-  <div id="itemsGrid" class="grid">
-    <p style="grid-column:span 2;text-align:center;color:#64748B;padding:40px 0;">Loading fresh items...</p>
-  </div>
+  <div id="itemsGrid" class="grid"></div>
 </div>
 
 <div id="viewCategories" class="view">
@@ -167,7 +167,7 @@
     <div id="cartFloatTitle" style="font-size:13px;font-weight:800;">0 Items | ₹0</div>
     <div id="cartFloatSub" style="font-size:11px;opacity:0.9;">Add ₹99 more for minimum order</div>
   </div>
-  <div id="cartFloatAction" style="font-size:14px;font-weight:800;">View Cart →</div>
+  <div style="font-size:14px;font-weight:800;">View Cart →</div>
 </div>
 
 <nav class="bottom-nav">
@@ -277,20 +277,19 @@
   </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, addDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<!-- Firebase Compat SDKs (Works reliably in Android WebView) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
+<script>
   function safeParse(key, fallback) {
     try {
-      const val = localStorage.getItem(key);
-      return val ? JSON.parse(val) : fallback;
-    } catch (e) {
-      return fallback;
-    }
+      var v = localStorage.getItem(key);
+      return v ? JSON.parse(v) : fallback;
+    } catch (e) { return fallback; }
   }
 
-  const CATEGORIES = [
+  var CATEGORIES = [
     { name: "Vegetables & Fruits", icon: "🥦" },
     { name: "Dairy & Bread", icon: "🥛" },
     { name: "Atta, Rice & Dal", icon: "🌾" },
@@ -299,34 +298,15 @@
     { name: "Daily Essentials", icon: "🧴" }
   ];
 
-  // Render Category Strips immediately before Firebase connects
-  document.getElementById("homeCatStrip").innerHTML = CATEGORIES.map(c =>
-    `<div class="cat-chip" data-cat="${c.name}" onclick="selectCategory('${c.name}')"><div class="cat-icon">${c.icon}</div><div class="cat-label">${c.name}</div></div>`
-  ).join("");
-
-  document.getElementById("catBigGrid").innerHTML = CATEGORIES.map(c =>
-    `<div class="cat-big-card" onclick="selectCategory('${c.name}'); switchNav('home');"><div>${c.icon}</div><div>${c.name}</div></div>`
-  ).join("");
-
-  const firebaseConfig = { projectId: "go-groc-f488d" };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  let allItems = [];
-  let allOrders = [];
-  let cart = safeParse("gogroc_cart", {});
-  let wishlist = safeParse("gogroc_wishlist", []);
-  let savedProfile = safeParse("gogroc_profile", null);
-  let selectedCategory = "All";
-  let saveAsTag = "Home";
-  let doorPhotoBase64 = "";
-  let isStoreOpen = true;
-  let proceedAfterAddr = false;
-
-  function syncProfileUI() {
-    if (savedProfile && savedProfile.house) {
-      const shortTxt = `${savedProfile.tag || 'Home'}: ${savedProfile.house}, ${savedProfile.landmark}`;
-      document.getElementById("headerAddrText").textContent = "📍 " + shortTxt;
-      document.getElementById("cartAddrPreview").innerHTML = `<b>${savedProfile.name} (${savedProfile.phone})</b><br>${savedProfile.house}${savedProfile.floor ? ', Floor ' + savedProfile.floor : ''}, ${savedProfile.landmark}, ${savedProfile.area}`;
-      document.getElementById("addrHouse").value = savedProfile.house || "";
-      document.getEl
+  // Starter items (automatically replaced/merged when you add items in Admin Panel)
+  var STARTER_ITEMS = [
+    { id: "s1", name: "Fresh Aloo (Potato) 1 kg", category: "Vegetables & Fruits", mrp: 40, price: 28, emoji: "🥔", desc: "Farm fresh sorted potatoes" },
+    { id: "s2", name: "Red Onion (Pyaz) 1 kg", category: "Vegetables & Fruits", mrp: 45, price: 32, emoji: "🧅", desc: "Fresh Nashik red onions" },
+    { id: "s3", name: "Desi Tomato 500 g", category: "Vegetables & Fruits", mrp: 30, price: 20, emoji: "🍅", desc: "Juicy red tomatoes" },
+    { id: "s4", name: "Fresh Banana (6 pcs)", category: "Vegetables & Fruits", mrp: 45, price: 35, emoji: "🍌", desc: "Ripe sweet bananas" },
+    { id: "s5", name: "Saras Gold Full Cream Milk 1L", category: "Dairy & Bread", mrp: 68, price: 66, emoji: "🥛", desc: "Fresh pasteurized milk" },
+    { id: "s6", name: "Fresh Dahi (Curd) 400 g", category: "Dairy & Bread", mrp: 40, price: 35, emoji: "🥣", desc: "Thick & creamy curd" },
+    { id: "s7", name: "White Sandwich Bread", category: "Dairy & Bread", mrp: 45, price: 40, emoji: "🍞", desc: "Soft freshly baked bread" },
+    { id: "s8", name: "Amul Pasteurised Butter 100g", category: "Dairy & Bread", mrp: 60, price: 56, emoji: "🧈", desc: "Utterly butterly delicious" },
+    { id: "s9", name: "Aashirvaad Shudh Chakki Atta 5kg", category: "Atta, Rice & Dal", mrp: 265, price: 235, emoji: "🌾", desc: "100% whole wheat flour" },
+    { id: "s10", name: "Basmati Rice 1 kg", category: "Atta, Rice & Dal", mrp: 110, p
