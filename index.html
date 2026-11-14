@@ -7,7 +7,6 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
   body { background: #F4F6F9; color: #1A1D24; padding-bottom: 135px; }
-
   header { background: #FFFFFF; padding: 12px 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .brand-wrap { display: flex; align-items: center; gap: 8px; }
@@ -17,28 +16,23 @@
   .status-closed { background: #FEE2E2; color: #DC2626; }
   .addr-strip { display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 6px 10px; margin-bottom: 8px; font-size: 12px; color: #334155; cursor: pointer; }
   .search-box { width: 100%; background: #F1F5F9; border: 1px solid #E2E8F0; color: #0F172A; padding: 10px 14px; border-radius: 10px; font-size: 14px; outline: none; }
-
   .view { display: none; }
   .view.active { display: block; }
-
   .sec-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 14px 8px; }
   .sec-title { font-size: 16px; font-weight: 800; color: #0F172A; }
   .sec-link { font-size: 12px; font-weight: 700; color: #16A34A; cursor: pointer; }
-
   .deals-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 14px 10px; scrollbar-width: none; }
   .deals-scroll::-webkit-scrollbar { display: none; }
   .deal-card { min-width: 145px; max-width: 145px; background: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%); border: 1px solid #DBEAFE; border-radius: 12px; padding: 8px; position: relative; flex-shrink: 0; }
   .deal-tag { position: absolute; top: 6px; left: 6px; background: #2563EB; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
   .deal-emoji { width: 100%; height: 76px; background: #FFFFFF; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; font-size: 38px; overflow: hidden; }
   .deal-emoji img { width: 100%; height: 100%; object-fit: cover; }
-
   .cat-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 14px 10px; scrollbar-width: none; }
   .cat-strip::-webkit-scrollbar { display: none; }
   .cat-chip { min-width: 78px; text-align: center; cursor: pointer; flex-shrink: 0; }
   .cat-icon { width: 58px; height: 58px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
   .cat-chip.active .cat-icon { background: #DCFCE7; border-color: #16A34A; }
   .cat-label { font-size: 11px; font-weight: 700; color: #334155; line-height: 1.2; }
-
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 14px 14px; }
   .card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
   .wish-icon { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.95); border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 5; }
@@ -56,35 +50,28 @@
   .qty-box button { background: none; border: none; color: #fff; font-weight: 800; padding: 5px 9px; font-size: 14px; cursor: pointer; }
   .qty-box span { color: #fff; font-weight: 800; font-size: 12px; padding: 0 4px; }
   .out-badge { font-size: 11px; color: #DC2626; font-weight: 700; }
-
   .cat-big-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
   .cat-big-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; }
   .cat-big-card div:first-child { font-size: 36px; margin-bottom: 8px; }
   .cat-big-card div:last-child { font-size: 14px; font-weight: 800; color: #0F172A; }
-
   .cart-float { position: fixed; bottom: 64px; left: 10px; right: 10px; background: #16A34A; color: #fff; border-radius: 14px; padding: 10px 14px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 6px 20px rgba(22,163,74,0.35); z-index: 150; cursor: pointer; }
   .cart-float.locked { background: #1E293B; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
-
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 58px; background: #FFFFFF; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-around; align-items: center; z-index: 180; }
   .nav-item { flex: 1; text-align: center; color: #64748B; font-size: 11px; font-weight: 700; cursor: pointer; padding: 6px 0; position: relative; }
   .nav-item.active { color: #16A34A; }
   .nav-icon { font-size: 19px; display: block; margin-bottom: 2px; }
   .nav-badge { position: absolute; top: 3px; right: 26%; background: #DC2626; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 10px; display: none; }
-
   .full-modal { position: fixed; inset: 0; background: #F4F6F9; display: none; flex-direction: column; z-index: 300; overflow-y: auto; padding-bottom: 90px; }
   .modal-top { background: #FFFFFF; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 10; }
   .back-btn { font-size: 20px; font-weight: 800; cursor: pointer; color: #0F172A; background: none; border: none; }
   .box-card { background: #FFFFFF; margin: 12px; border-radius: 14px; padding: 14px; border: 1px solid #E2E8F0; }
-
   .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F1F5F9; gap: 8px; }
   .cart-row:last-child { border-bottom: none; }
   .cart-row-info { flex: 1; }
   .cart-wish-btn { background: #F8FAFC; border: 1px solid #E2E8F0; color: #475569; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; margin-top: 4px; cursor: pointer; display: inline-block; }
   .add-more-btn { width: 100%; background: #F8FAFC; border: 1.5px dashed #16A34A; color: #16A34A; font-weight: 800; font-size: 13px; padding: 10px; border-radius: 10px; margin-top: 10px; cursor: pointer; }
-
   .field-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; display: block; }
   .input-field { width: 100%; background: #FFFFFF; border: 1px solid #CBD5E1; color: #0F172A; padding: 11px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; outline: none; }
-  .input-field:focus { border-color: #16A34A; }
   .save-as-row { display: flex; gap: 8px; margin-bottom: 12px; }
   .tag-chip { padding: 7px 14px; border-radius: 20px; border: 1px solid #CBD5E1; background: #fff; font-size: 12px; font-weight: 700; color: #475569; cursor: pointer; }
   .tag-chip.active { background: #DCFCE7; border-color: #16A34A; color: #15803D; }
@@ -92,7 +79,6 @@
   .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: #FFFFFF; padding: 12px 14px; border-top: 1px solid #E2E8F0; z-index: 320; }
   .btn-green { width: 100%; background: #16A34A; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; }
   .btn-green:disabled { background: #94A3B8; cursor: not-allowed; }
-
   .order-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin: 12px; }
   .progress-track { display: flex; justify-content: space-between; position: relative; margin: 14px 0 10px; }
   .progress-track::before { content: ""; position: absolute; top: 9px; left: 12%; right: 12%; height: 3px; background: #E2E8F0; z-index: 1; }
@@ -171,20 +157,10 @@
 </div>
 
 <nav class="bottom-nav">
-  <div id="navHome" class="nav-item active" onclick="switchNav('home')">
-    <span class="nav-icon">🏠</span>Home
-  </div>
-  <div id="navCategories" class="nav-item" onclick="switchNav('categories')">
-    <span class="nav-icon">📦</span>Categories
-  </div>
-  <div id="navWishlist" class="nav-item" onclick="switchNav('wishlist')">
-    <span id="wishBadge" class="nav-badge">0</span>
-    <span class="nav-icon">🔖</span>Wishlist
-  </div>
-  <div id="navOrders" class="nav-item" onclick="switchNav('orders')">
-    <span id="orderBadge" class="nav-badge">●</span>
-    <span class="nav-icon">🛵</span>Orders
-  </div>
+  <div id="navHome" class="nav-item active" onclick="switchNav('home')"><span class="nav-icon">🏠</span>Home</div>
+  <div id="navCategories" class="nav-item" onclick="switchNav('categories')"><span class="nav-icon">📦</span>Categories</div>
+  <div id="navWishlist" class="nav-item" onclick="switchNav('wishlist')"><span id="wishBadge" class="nav-badge">0</span><span class="nav-icon">🔖</span>Wishlist</div>
+  <div id="navOrders" class="nav-item" onclick="switchNav('orders')"><span id="orderBadge" class="nav-badge">●</span><span class="nav-icon">🛵</span>Orders</div>
 </nav>
 
 <div id="cartModal" class="full-modal">
@@ -195,12 +171,10 @@
       <div style="font-size:11px;color:#16A34A;font-weight:700;">Minimum Order Value: ₹99</div>
     </div>
   </div>
-
   <div class="box-card">
     <div id="fullCartList"></div>
     <button class="add-more-btn" onclick="closeCartModal()">+ Add more items</button>
   </div>
-
   <div class="box-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
       <span style="font-size:13px;font-weight:800;">📍 Delivery Address</span>
@@ -208,22 +182,12 @@
     </div>
     <div id="cartAddrPreview" style="font-size:13px;color:#475569;line-height:1.4;">No address saved yet. Tap "Add address to proceed" below.</div>
   </div>
-
   <div class="box-card">
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#475569;">
-      <span>Item Total</span><span id="billItemTotal">₹0</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:#16A34A;font-weight:700;">
-      <span>Delivery Charge</span><span>FREE (Above ₹99)</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1px solid #E2E8F0;padding-top:8px;">
-      <span>To Pay (Cash on Delivery)</span><span id="billGrandTotal">₹0</span>
-    </div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#475569;"><span>Item Total</span><span id="billItemTotal">₹0</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:#16A34A;font-weight:700;"><span>Delivery Charge</span><span>FREE (Above ₹99)</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1px solid #E2E8F0;padding-top:8px;"><span>To Pay (Cash on Delivery)</span><span id="billGrandTotal">₹0</span></div>
   </div>
-
-  <div class="sticky-cta">
-    <button id="cartProceedBtn" class="btn-green" onclick="handleCartProceed()">Add address to proceed</button>
-  </div>
+  <div class="sticky-cta"><button id="cartProceedBtn" class="btn-green" onclick="handleCartProceed()">Add address to proceed</button></div>
 </div>
 
 <div id="addressModal" class="full-modal" style="z-index:350;">
@@ -231,20 +195,15 @@
     <button class="back-btn" onclick="closeAddressModal()">←</button>
     <div style="font-size:16px;font-weight:800;">Enter Complete Address</div>
   </div>
-
   <div class="box-card">
     <label class="field-label">House / Flat / Plot Number *</label>
     <input type="text" id="addrHouse" class="input-field" placeholder="e.g., House No. 14, Near Masjid">
-
     <label class="field-label">Floor Number</label>
     <input type="text" id="addrFloor" class="input-field" placeholder="e.g., Ground Floor / 1st Floor">
-
     <label class="field-label">Building / Street / Landmark *</label>
     <input type="text" id="addrLandmark" class="input-field" placeholder="e.g., Station Road, Opp. Water Tank">
-
     <label class="field-label">Area / Locality *</label>
     <input type="text" id="addrArea" class="input-field" value="Makrana, Rajasthan">
-
     <label class="field-label">Save Address As</label>
     <div class="save-as-row">
       <div class="tag-chip active" onclick="selectSaveAs(this, 'Home')">🏠 Home</div>
@@ -252,16 +211,13 @@
       <div class="tag-chip" onclick="selectSaveAs(this, 'Other')">📍 Other</div>
     </div>
   </div>
-
   <div class="box-card">
     <div style="font-size:14px;font-weight:800;margin-bottom:10px;">Receiver Details</div>
     <label class="field-label">Receiver's Name *</label>
     <input type="text" id="custName" class="input-field" placeholder="Full Name">
-
     <label class="field-label">Receiver's Mobile Number *</label>
     <input type="tel" id="custPhone" class="input-field" placeholder="10-digit Mobile Number">
   </div>
-
   <div class="box-card">
     <div style="font-size:14px;font-weight:800;margin-bottom:4px;">Door / Building Photo (Optional)</div>
     <div style="font-size:12px;color:#64748B;margin-bottom:10px;">Helps our delivery partner find your house faster without extra calls</div>
@@ -271,42 +227,362 @@
       <img id="doorPhotoPreview" style="width:48px;height:48px;border-radius:8px;object-fit:cover;display:none;">
     </label>
   </div>
-
-  <div class="sticky-cta">
-    <button id="saveAddrBtn" class="btn-green" onclick="saveAddressAndProceed()">Save Address & Continue</button>
-  </div>
+  <div class="sticky-cta"><button id="saveAddrBtn" class="btn-green" onclick="saveAddressAndProceed()">Save Address & Continue</button></div>
 </div>
 
-<!-- Firebase Compat SDKs (Works reliably in Android WebView) -->
+<script>
+window.onerror = function(msg, src, line) {
+  var g = document.getElementById("itemsGrid");
+  if (g) g.innerHTML = "<p style='grid-column:span 2;color:red;padding:20px;'>JS Error: " + msg + " (Line " + line + ")</p>";
+};
+
+function safeParse(k, f) {
+  try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch (e) { return f; }
+}
+
+var CATEGORIES = [
+  { name: "Vegetables & Fruits", icon: "🥦" },
+  { name: "Dairy & Bread", icon: "🥛" },
+  { name: "Atta, Rice & Dal", icon: "🌾" },
+  { name: "Snacks & Drinks", icon: "🍟" },
+  { name: "Fast Food", icon: "🍔" },
+  { name: "Daily Essentials", icon: "🧴" }
+];
+
+var STARTER_ITEMS = [
+  { id: "s1", name: "Fresh Aloo (Potato) 1 kg", category: "Vegetables & Fruits", mrp: 40, price: 28, emoji: "🥔", desc: "Farm fresh sorted potatoes" },
+  { id: "s2", name: "Red Onion (Pyaz) 1 kg", category: "Vegetables & Fruits", mrp: 45, price: 32, emoji: "🧅", desc: "Fresh Nashik red onions" },
+  { id: "s3", name: "Desi Tomato 500 g", category: "Vegetables & Fruits", mrp: 30, price: 20, emoji: "🍅", desc: "Juicy red tomatoes" },
+  { id: "s4", name: "Fresh Banana (6 pcs)", category: "Vegetables & Fruits", mrp: 45, price: 35, emoji: "🍌", desc: "Ripe sweet bananas" },
+  { id: "s5", name: "Saras Gold Full Cream Milk 1L", category: "Dairy & Bread", mrp: 68, price: 66, emoji: "🥛", desc: "Fresh pasteurized milk" },
+  { id: "s6", name: "Fresh Dahi (Curd) 400 g", category: "Dairy & Bread", mrp: 40, price: 35, emoji: "🥣", desc: "Thick & creamy curd" },
+  { id: "s7", name: "White Sandwich Bread", category: "Dairy & Bread", mrp: 45, price: 40, emoji: "🍞", desc: "Soft freshly baked bread" },
+  { id: "s8", name: "Amul Pasteurised Butter 100g", category: "Dairy & Bread", mrp: 60, price: 56, emoji: "🧈", desc: "Utterly butterly delicious" },
+  { id: "s9", name: "Aashirvaad Shudh Chakki Atta 5kg", category: "Atta, Rice & Dal", mrp: 265, price: 235, emoji: "🌾", desc: "100% whole wheat flour" },
+  { id: "s10", name: "Basmati Rice 1 kg", category: "Atta, Rice & Dal", mrp: 110, price: 89, emoji: "🍚", desc: "Long grain aromatic rice" },
+  { id: "s11", name: "Toor / Arhar Dal 1 kg", category: "Atta, Rice & Dal", mrp: 175, price: 155, emoji: "🫘", desc: "Unpolished protein-rich dal" },
+  { id: "s12", name: "Fortune Refined Soyabean Oil 1L", category: "Atta, Rice & Dal", mrp: 145, price: 129, emoji: "🫗", desc: "Light & healthy cooking oil" },
+  { id: "s13", name: "Lay's Classic Salted Chips", category: "Snacks & Drinks", mrp: 20, price: 20, emoji: "🍟", desc: "Crispy potato chips pack" },
+  { id: "s14", name: "Coca-Cola Cold Drink 750 ml", category: "Snacks & Drinks", mrp: 45, price: 40, emoji: "🥤", desc: "Chilled refreshing drink" },
+  { id: "s15", name: "Parle-G Gold Biscuits Pack", category: "Snacks & Drinks", mrp: 30, price: 28, emoji: "🍪", desc: "Crunchy tea-time biscuits" },
+  { id: "s16", name: "Aloo Tikki Burger", category: "Fast Food", mrp: 60, price: 40, emoji: "🍔", desc: "Crispy aloo patty, onion, tomato & creamy mayo" },
+  { id: "s17", name: "Veg Cheese Grilled Sandwich", category: "Fast Food", mrp: 80, price: 60, emoji: "🥪", desc: "Loaded veggies with melted cheese" },
+  { id: "s18", name: "Cold Coffee (300 ml)", category: "Fast Food", mrp: 70, price: 55, emoji: "🧋", desc: "Thick creamy chilled coffee" },
+  { id: "s19", name: "Tata Iodized Salt 1 kg", category: "Daily Essentials", mrp: 28, price: 26, emoji: "🧂", desc: "Desh ka namak" },
+  { id: "s20", name: "Surf Excel Detergent Bar (Pack of 3)", category: "Daily Essentials", mrp: 90, price: 78, emoji: "🧼", desc: "Tough stain removal" }
+];
+
+var db = null;
+var allItems = STARTER_ITEMS.slice();
+var allOrders = [];
+var cart = safeParse("gogroc_cart", {});
+var wishlist = safeParse("gogroc_wishlist", []);
+var savedProfile = safeParse("gogroc_profile", null);
+var selectedCategory = "All";
+var saveAsTag = "Home";
+var doorPhotoBase64 = "";
+var isStoreOpen = true;
+var proceedAfterAddr = false;
+
+function initCategories() {
+  var h = "", b = "";
+  for (var i = 0; i < CATEGORIES.length; i++) {
+    var c = CATEGORIES[i];
+    h += '<div class="cat-chip" data-cat="' + c.name + '" onclick="selectCategory(\'' + c.name + '\')"><div class="cat-icon">' + c.icon + '</div><div class="cat-label">' + c.name + '</div></div>';
+    b += '<div class="cat-big-card" onclick="selectCategory(\'' + c.name + '\'); switchNav(\'home\');"><div>' + c.icon + '</div><div>' + c.name + '</div></div>';
+  }
+  document.getElementById("homeCatStrip").innerHTML = h;
+  document.getElementById("catBigGrid").innerHTML = b;
+}
+
+function syncProfileUI() {
+  if (savedProfile && savedProfile.house) {
+    document.getElementById("headerAddrText").textContent = "📍 " + (savedProfile.tag || "Home") + ": " + savedProfile.house + ", " + savedProfile.landmark;
+    document.getElementById("cartAddrPreview").innerHTML = "<b>" + savedProfile.name + " (" + savedProfile.phone + ")</b><br>" + savedProfile.house + (savedProfile.floor ? ", Floor " + savedProfile.floor : "") + ", " + savedProfile.landmark + ", " + savedProfile.area;
+    document.getElementById("addrHouse").value = savedProfile.house || "";
+    document.getElementById("addrFloor").value = savedProfile.floor || "";
+    document.getElementById("addrLandmark").value = savedProfile.landmark || "";
+    document.getElementById("addrArea").value = savedProfile.area || "Makrana, Rajasthan";
+    document.getElementById("custName").value = savedProfile.name || "";
+    document.getElementById("custPhone").value = savedProfile.phone || "";
+    document.getElementById("trackPhoneInput").value = savedProfile.phone || "";
+  }
+}
+
+function switchNav(tab) {
+  var tabs = ["home", "categories", "wishlist", "orders"];
+  for (var i = 0; i < tabs.length; i++) {
+    var t = tabs[i];
+    var cap = t.charAt(0).toUpperCase() + t.slice(1);
+    document.getElementById("view" + cap).classList.toggle("active", t === tab);
+    document.getElementById("nav" + cap).classList.toggle("active", t === tab);
+  }
+  if (tab === "wishlist") renderWishlist();
+  if (tab === "orders") renderOrders();
+}
+
+function selectCategory(cat) {
+  selectedCategory = cat;
+  var chips = document.querySelectorAll(".cat-chip");
+  for (var i = 0; i < chips.length; i++) chips[i].classList.toggle("active", chips[i].getAttribute("data-cat") === cat);
+  document.getElementById("gridHeading").textContent = cat === "All" ? "All Fresh Items" : cat;
+  document.getElementById("clearFilterBtn").style.display = cat === "All" ? "none" : "inline";
+  renderItems();
+}
+
+function onSearchInput() { switchNav("home"); renderItems(); }
+
+function itemVisualHTML(item) {
+  return (item.image && item.image.length > 10) ? '<img src="' + item.image + '">' : (item.emoji || "🛒");
+}
+
+function itemCardHTML(item) {
+  var qty = cart[item.id] || 0;
+  var inStock = item.inStock !== false;
+  var isWished = wishlist.indexOf(item.id) !== -1;
+  var hasDeal = item.mrp && Number(item.mrp) > Number(item.price);
+  var btn = !inStock ? '<span class="out-badge">Out of Stock</span>' :
+    (qty === 0 ? '<button class="btn-add" onclick="updateQty(\'' + item.id + '\', 1)">ADD</button>' :
+    '<div class="qty-box"><button onclick="updateQty(\'' + item.id + '\', -1)">−</button><span>' + qty + '</span><button onclick="updateQty(\'' + item.id + '\', 1)">+</button></div>');
+  return '<div class="card"><div class="wish-icon" onclick="toggleWishlist(\'' + item.id + '\')">' + (isWished ? "❤️" : "🔖") + '</div><div class="card-img-box">' + itemVisualHTML(item) + '</div><div class="card-body"><div class="item-cat">' + (item.category || "Daily Essentials") + '</div><div class="item-name">' + item.name + '</div><div class="item-desc">' + (item.desc || "") + '</div><div class="price-row"><div>' + (hasDeal ? '<span class="mrp">₹' + item.mrp + '</span>' : '') + '<span class="price">₹' + item.price + '</span></div>' + btn + '</div></div></div>';
+}
+
+function renderDeals() {
+  var deals = allItems.filter(function(i) { return i.mrp && Number(i.mrp) > Number(i.price) && i.inStock !== false; });
+  var sec = document.getElementById("dealsSection");
+  if (!deals.length) { sec.style.display = "none"; return; }
+  sec.style.display = "block";
+  document.getElementById("dealsRow").innerHTML = deals.map(function(item) {
+    var off = Math.round(((item.mrp - item.price) / item.mrp) * 100);
+    var qty = cart[item.id] || 0;
+    var btn = qty === 0 ? '<button class="btn-add" style="padding:4px 10px;" onclick="updateQty(\'' + item.id + '\', 1)">ADD</button>' : '<div class="qty-box"><button onclick="updateQty(\'' + item.id + '\', -1)">−</button><span>' + qty + '</span><button onclick="updateQty(\'' + item.id + '\', 1)">+</button></div>';
+    return '<div class="deal-card"><span class="deal-tag">' + off + '% OFF</span><div class="deal-emoji">' + itemVisualHTML(item) + '</div><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;">' + item.name + '</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><span class="mrp">₹' + item.mrp + '</span><b style="font-size:14px;">₹' + item.price + '</b></div>' + btn + '</div></div>';
+  }).join("");
+}
+
+function renderItems() {
+  var q = document.getElementById("searchInput").value.toLowerCase();
+  var grid = document.getElementById("itemsGrid");
+  var filtered = allItems.filter(function(i) {
+    return ((i.name || "").toLowerCase().indexOf(q) !== -1 || (i.category || "").toLowerCase().indexOf(q) !== -1) &&
+           (selectedCategory === "All" || (i.category || "Daily Essentials") === selectedCategory);
+  });
+  grid.innerHTML = filtered.length ? filtered.map(itemCardHTML).join("") : '<p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px;">No items found</p>';
+}
+
+function renderWishlist() {
+  var wished = allItems.filter(function(i) { return wishlist.indexOf(i.id) !== -1; });
+  var badge = document.getElementById("wishBadge");
+  badge.style.display = wished.length ? "inline-block" : "none";
+  badge.textContent = wished.length;
+  document.getElementById("wishlistGrid").innerHTML = wished.length ? wished.map(itemCardHTML).join("") : '<p style="grid-column:span 2;text-align:center;color:#64748B;padding:40px 0;">Tap 🔖 on any item to save it to your Wishlist.</p>';
+}
+
+function renderAll() { renderDeals(); renderItems(); renderWishlist(); updateCartUI(); }
+
+function toggleWishlist(id) {
+  var idx = wishlist.indexOf(id);
+  if (idx !== -1) wishlist.splice(idx, 1); else wishlist.push(id);
+  localStorage.setItem("gogroc_wishlist", JSON.stringify(wishlist));
+  renderAll();
+  if (document.getElementById("cartModal").style.display === "flex") renderFullCart();
+}
+
+function updateQty(id, change) {
+  if (!isStoreOpen) { alert("Sorry, store is currently closed!"); return; }
+  cart[id] = (cart[id] || 0) + change;
+  if (cart[id] <= 0) delete cart[id];
+  localStorage.setItem("gogroc_cart", JSON.stringify(cart));
+  renderAll();
+  if (document.getElementById("cartModal").style.display === "flex") renderFullCart();
+}
+
+function getCartTotals() {
+  var count = 0, total = 0;
+  for (var id in cart) {
+    if (!cart.hasOwnProperty(id)) continue;
+    var item = allItems.find(function(i) { return i.id === id; });
+    if (item) { count += cart[id]; total += Number(item.price) * cart[id]; }
+  }
+  return { count: count, total: total };
+}
+
+function updateCartUI() {
+  var res = getCartTotals();
+  var bar = document.getElementById("cartFloat");
+  if (res.count === 0) {
+    bar.style.display = "none";
+    if (document.getElementById("cartModal").style.display === "flex") closeCartModal();
+    return;
+  }
+  bar.style.display = "flex";
+  document.getElementById("cartFloatTitle").textContent = res.count + " Item" + (res.count > 1 ? "s" : "") + " | ₹" + res.total;
+  if (res.total < 99) {
+    bar.classList.add("locked");
+    document.getElementById("cartFloatSub").textContent = "Add ₹" + (99 - res.total) + " more (Min order ₹99)";
+  } else {
+    bar.classList.remove("locked");
+    document.getElementById("cartFloatSub").textContent = "✓ Minimum ₹99 unlocked • Free Delivery";
+  }
+}
+
+function openCartModal() { renderFullCart(); document.getElementById("cartModal").style.display = "flex"; }
+function closeCartModal() { document.getElementById("cartModal").style.display = "none"; }
+
+function renderFullCart() {
+  var res = getCartTotals();
+  var html = "";
+  for (var id in cart) {
+    if (!cart.hasOwnProperty(id)) continue;
+    var item = allItems.find(function(i) { return i.id === id; });
+    if (!item) continue;
+    var qty = cart[id];
+    var isWished = wishlist.indexOf(id) !== -1;
+    html += '<div class="cart-row"><div class="cart-row-info"><div style="font-size:14px;font-weight:700;">' + item.name + '</div><div style="font-size:13px;font-weight:800;color:#0F172A;margin-top:2px;">₹' + (item.price * qty) + ' <span style="font-size:11px;color:#64748B;font-weight:500;">(₹' + item.price + ' each)</span></div><button class="cart-wish-btn" onclick="toggleWishlist(\'' + id + '\')">' + (isWished ? "❤️ Saved in Wishlist" : "🔖 Save to Wishlist") + '</button></div><div class="qty-box"><button onclick="updateQty(\'' + id + '\', -1)">−</button><span>' + qty + '</span><button onclick="updateQty(\'' + id + '\', 1)">+</button></div></div>';
+  }
+  document.getElementById("fullCartList").innerHTML = html;
+  document.getElementById("billItemTotal").textContent = "₹" + res.total;
+  document.getElementById("billGrandTotal").textContent = "₹" + res.total;
+  var btn = document.getElementById("cartProceedBtn");
+  if (res.total < 99) { btn.disabled = true; btn.textContent = "Add ₹" + (99 - res.total) + " more (Minimum Order ₹99)"; }
+  else if (!savedProfile || !savedProfile.house) { btn.disabled = false; btn.textContent = "Add address to proceed"; }
+  else { btn.disabled = false; btn.textContent = "Place COD Order • ₹" + res.total; }
+}
+
+function handleCartProceed() {
+  if (getCartTotals().total < 99) return;
+  if (!savedProfile || !savedProfile.house) openAddressModal(true); else submitOrder();
+}
+
+function openAddressModal(fromCart) { proceedAfterAddr = fromCart; document.getElementById("addressModal").style.display = "flex"; }
+function closeAddressModal() { document.getElementById("addressModal").style.display = "none"; }
+
+function selectSaveAs(el, tag) {
+  saveAsTag = tag;
+  var chips = document.querySelectorAll(".tag-chip");
+  for (var i = 0; i < chips.length; i++) chips[i].classList.remove("active");
+  el.classList.add("active");
+}
+
+function compressDoorPhoto(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement("canvas");
+      var scale = 360 / img.width;
+      canvas.width = 360; canvas.height = img.height * scale;
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      doorPhotoBase64 = canvas.toDataURL("image/jpeg", 0.65);
+      var prev = document.getElementById("doorPhotoPreview");
+      prev.src = doorPhotoBase64; prev.style.display = "block";
+      document.getElementById("doorPhotoLabel").textContent = "✓ House photo attached";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveAddressAndProceed() {
+  var house = document.getElementById("addrHouse").value.trim();
+  var floor = document.getElementById("addrFloor").value.trim();
+  var landmark = document.getElementById("addrLandmark").value.trim();
+  var area = document.getElementById("addrArea").value.trim();
+  var name = document.getElementById("custName").value.trim();
+  var phone = document.getElementById("custPhone").value.trim();
+  if (!house || !landmark || !name || !phone) { alert("Please fill House No., Landmark, Name, and Mobile Number!"); return; }
+  savedProfile = { house: house, floor: floor, landmark: landmark, area: area, tag: saveAsTag, name: name, phone: phone, doorPhoto: doorPhotoBase64 };
+  localStorage.setItem("gogroc_profile", JSON.stringify(savedProfile));
+  syncProfileUI(); closeAddressModal();
+  if (proceedAfterAddr) { renderFullCart(); submitOrder(); }
+}
+
+function submitOrder() {
+  var res = getCartTotals();
+  if (res.total < 99) return;
+  if (!db) { alert("Connecting to server, please wait 2 seconds and tap again."); return; }
+  var btn = document.getElementById("cartProceedBtn");
+  btn.disabled = true; btn.textContent = "Placing Order...";
+  var orderItems = [];
+  for (var id in cart) {
+    if (!cart.hasOwnProperty(id)) continue;
+    var item = allItems.find(function(i) { return i.id === id; });
+    if (item) orderItems.push({ name: item.name, qty: cart[id], price: Number(item.price) });
+  }
+  var fullAddress = "[" + savedProfile.tag + "] " + savedProfile.house + (savedProfile.floor ? ", Floor " + savedProfile.floor : "") + ", " + savedProfile.landmark + ", " + savedProfile.area;
+  db.collection("orders").add({
+    customerName: savedProfile.name, phone: savedProfile.phone, address: fullAddress,
+    doorPhoto: savedProfile.doorPhoto || "", items: orderItems, total: res.total,
+    status: "Placed", createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(docRef) {
+    var savedIds = safeParse("gogroc_order_ids", []);
+    savedIds.unshift(docRef.id);
+    localStorage.setItem("gogroc_order_ids", JSON.stringify(savedIds.slice(0, 15)));
+    cart = {}; localStorage.setItem("gogroc_cart", "{}");
+    renderAll(); closeCartModal(); switchNav("orders");
+  }).catch(function(e) { alert("Error: " + e.message); btn.disabled = false; renderFullCart(); });
+}
+
+function saveAndTrackPhone() {
+  var p = document.getElementById("trackPhoneInput").value.trim();
+  if (p) { savedProfile = Object.assign({}, savedProfile || {}, { phone: p }); localStorage.setItem("gogroc_profile", JSON.stringify(savedProfile)); }
+  renderOrders();
+}
+
+function renderOrders() {
+  var phoneQuery = (document.getElementById("trackPhoneInput").value || "").replace(/\D/g, "").slice(-10);
+  var savedIds = safeParse("gogroc_order_ids", []);
+  var myOrders = allOrders.filter(function(o) {
+    var oPhone = (o.phone || "").replace(/\D/g, "").slice(-10);
+    return (phoneQuery && oPhone === phoneQuery) || savedIds.indexOf(o.id) !== -1;
+  });
+  var badge = document.getElementById("orderBadge");
+  badge.style.display = myOrders.some(function(o) { return ["Delivered", "Completed", "Cancelled"].indexOf(o.status) === -1; }) ? "inline-block" : "none";
+  var container = document.getElementById("ordersList");
+  if (!myOrders.length) { container.innerHTML = '<p style="text-align:center;color:#64748B;padding:30px 0;">No orders placed yet.</p>'; return; }
+  container.innerHTML = myOrders.map(function(o) {
+    var st = (o.status || "Placed").toLowerCase();
+    var step2 = st.indexOf("prepar") !== -1 || st.indexOf("out") !== -1 || st.indexOf("deliver") !== -1 || st.indexOf("complet") !== -1;
+    var step3 = st.indexOf("deliver") !== -1 || st.indexOf("complet") !== -1;
+    var itemsText = (o.items || []).map(function(i) { return i.qty + "x " + i.name; }).join(", ");
+    return '<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;color:#64748B;">ORDER #' + o.id.slice(0,6).toUpperCase() + '</span><span style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;background:#DCFCE7;color:#15803D;">' + (o.status || "Placed") + '</span></div><div class="progress-track"><div class="step active"><div class="step-dot">✓</div>Placed</div><div class="step ' + (step2 ? 'active' : '') + '"><div class="step-dot">' + (step2 ? '✓' : '2') + '</div>Out for Delivery</div><div class="step ' + (step3 ? 'active' : '') + '"><div class="step-dot">' + (step3 ? '✓' : '3') + '</div>Delivered</div></div><div style="font-size:13px;color:#1E293B;margin:8px 0;">' + itemsText + '</div><div style="font-size:12px;color:#64748B;border-top:1px solid #F1F5F9;padding-top:8px;display:flex;justify-content:space-between;"><span>📍 ' + (o.address || "") + '</span><b style="color:#16A34A;">₹' + o.total + '</b></div></div>';
+  }).join("");
+}
+
+initCategories();
+syncProfileUI();
+renderAll();
+</script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-  function safeParse(key, fallback) {
-    try {
-      var v = localStorage.getItem(key);
-      return v ? JSON.parse(v) : fallback;
-    } catch (e) { return fallback; }
+try {
+  if (typeof firebase !== "undefined") {
+    firebase.initializeApp({ projectId: "go-groc-f488d" });
+    db = firebase.firestore();
+    db.collection("settings").doc("store").onSnapshot(function(snap) {
+      if (snap.exists) {
+        isStoreOpen = snap.data().isOpen !== false;
+        var el = document.getElementById("storeStatus");
+        el.textContent = isStoreOpen ? "● OPEN" : "● CLOSED";
+        el.className = isStoreOpen ? "status-pill" : "status-pill status-closed";
+      }
+    });
+    db.collection("menu").onSnapshot(function(snapshot) {
+      var fbItems = snapshot.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+      allItems = fbItems.concat(STARTER_ITEMS);
+      renderAll();
+    });
+    db.collection("orders").onSnapshot(function(snapshot) {
+      allOrders = snapshot.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+      allOrders.sort(function(a, b) { return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0); });
+      renderOrders();
+    });
   }
-
-  var CATEGORIES = [
-    { name: "Vegetables & Fruits", icon: "🥦" },
-    { name: "Dairy & Bread", icon: "🥛" },
-    { name: "Atta, Rice & Dal", icon: "🌾" },
-    { name: "Snacks & Drinks", icon: "🍟" },
-    { name: "Fast Food", icon: "🍔" },
-    { name: "Daily Essentials", icon: "🧴" }
-  ];
-
-  // Starter items (automatically replaced/merged when you add items in Admin Panel)
-  var STARTER_ITEMS = [
-    { id: "s1", name: "Fresh Aloo (Potato) 1 kg", category: "Vegetables & Fruits", mrp: 40, price: 28, emoji: "🥔", desc: "Farm fresh sorted potatoes" },
-    { id: "s2", name: "Red Onion (Pyaz) 1 kg", category: "Vegetables & Fruits", mrp: 45, price: 32, emoji: "🧅", desc: "Fresh Nashik red onions" },
-    { id: "s3", name: "Desi Tomato 500 g", category: "Vegetables & Fruits", mrp: 30, price: 20, emoji: "🍅", desc: "Juicy red tomatoes" },
-    { id: "s4", name: "Fresh Banana (6 pcs)", category: "Vegetables & Fruits", mrp: 45, price: 35, emoji: "🍌", desc: "Ripe sweet bananas" },
-    { id: "s5", name: "Saras Gold Full Cream Milk 1L", category: "Dairy & Bread", mrp: 68, price: 66, emoji: "🥛", desc: "Fresh pasteurized milk" },
-    { id: "s6", name: "Fresh Dahi (Curd) 400 g", category: "Dairy & Bread", mrp: 40, price: 35, emoji: "🥣", desc: "Thick & creamy curd" },
-    { id: "s7", name: "White Sandwich Bread", category: "Dairy & Bread", mrp: 45, price: 40, emoji: "🍞", desc: "Soft freshly baked bread" },
-    { id: "s8", name: "Amul Pasteurised Butter 100g", category: "Dairy & Bread", mrp: 60, price: 56, emoji: "🧈", desc: "Utterly butterly delicious" },
-    { id: "s9", name: "Aashirvaad Shudh Chakki Atta 5kg", category: "Atta, Rice & Dal", mrp: 265, price: 235, emoji: "🌾", desc: "100% whole wheat flour" },
-    { id: "s10", name: "Basmati Rice 1 kg", category: "Atta, Rice & Dal", mrp: 110, p
+} catch (e) {}
+</script>
+</body>
+</html>
