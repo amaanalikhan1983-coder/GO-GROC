@@ -3,292 +3,400 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GO-GROC | Fast Grocery Delivery</title>
+<title>GO-GROC</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
   body { background: #F4F6F9; color: #1A1D24; padding-bottom: 135px; }
-  header { background: #FFFFFF; padding: 12px 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .brand-wrap { display: flex; align-items: center; gap: 8px; }
+  header { background: #fff; padding: 12px 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .logo { color: #16A34A; font-size: 21px; font-weight: 900; }
-  .delivery-tag { background: #ECFDF5; color: #15803D; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
-  .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: #DCFCE7; color: #15803D; font-weight: 700; }
-  .status-closed { background: #FEE2E2; color: #DC2626; }
-  .addr-strip { display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 6px 10px; margin-bottom: 8px; font-size: 12px; color: #334155; cursor: pointer; }
-  .search-box { width: 100%; background: #F1F5F9; border: 1px solid #E2E8F0; color: #0F172A; padding: 10px 14px; border-radius: 10px; font-size: 14px; outline: none; }
+  .pill { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: #DCFCE7; color: #15803D; font-weight: 700; }
+  .pill.closed { background: #FEE2E2; color: #DC2626; }
+  .addr-bar { display: flex; justify-content: space-between; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 7px 10px; margin-bottom: 8px; font-size: 12px; cursor: pointer; }
+  .search { width: 100%; background: #F1F5F9; border: 1px solid #E2E8F0; padding: 10px 12px; border-radius: 10px; font-size: 14px; outline: none; }
   .view { display: none; }
   .view.active { display: block; }
   .sec-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 14px 8px; }
-  .sec-title { font-size: 16px; font-weight: 800; color: #0F172A; }
+  .sec-title { font-size: 16px; font-weight: 800; }
   .sec-link { font-size: 12px; font-weight: 700; color: #16A34A; cursor: pointer; }
-  .deals-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 14px 10px; }
-  .deal-card { min-width: 145px; max-width: 145px; background: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 12px; padding: 8px; position: relative; flex-shrink: 0; }
-  .deal-tag { position: absolute; top: 6px; left: 6px; background: #2563EB; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
-  .deal-emoji { width: 100%; height: 76px; background: #FFFFFF; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; font-size: 38px; overflow: hidden; }
-  .deal-emoji img { width: 100%; height: 100%; object-fit: cover; }
   .cat-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 14px 10px; }
-  .cat-chip { min-width: 78px; text-align: center; cursor: pointer; flex-shrink: 0; }
-  .cat-icon { width: 58px; height: 58px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 5px; }
+  .cat-chip { min-width: 76px; text-align: center; cursor: pointer; flex-shrink: 0; }
+  .cat-icon { width: 56px; height: 56px; border-radius: 14px; background: #fff; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 25px; margin: 0 auto 4px; }
   .cat-chip.active .cat-icon { background: #DCFCE7; border-color: #16A34A; }
   .cat-label { font-size: 11px; font-weight: 700; color: #334155; }
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 14px 14px; }
-  .card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-  .wish-icon { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 5; }
-  .card-img-box { width: 100%; height: 110px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; font-size: 46px; overflow: hidden; }
-  .card-img-box img { width: 100%; height: 100%; object-fit: cover; }
-  .card-body { padding: 10px; }
-  .item-cat { font-size: 10px; font-weight: 700; color: #16A34A; text-transform: uppercase; margin-bottom: 2px; }
-  .item-name { font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 3px; }
-  .item-desc { font-size: 11px; color: #64748B; margin-bottom: 8px; }
-  .price-row { display: flex; justify-content: space-between; align-items: center; }
+  .card { background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+  .wish-btn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+  .img-box { width: 100%; height: 105px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; font-size: 44px; overflow: hidden; }
+  .img-box img { width: 100%; height: 100%; object-fit: cover; }
+  .c-body { padding: 10px; }
+  .c-cat { font-size: 10px; font-weight: 700; color: #16A34A; text-transform: uppercase; }
+  .c-name { font-size: 13px; font-weight: 700; margin: 2px 0; }
+  .c-desc { font-size: 11px; color: #64748B; margin-bottom: 8px; }
+  .p-row { display: flex; justify-content: space-between; align-items: center; }
   .mrp { font-size: 11px; color: #94A3B8; text-decoration: line-through; display: block; }
-  .price { font-size: 15px; font-weight: 800; color: #0F172A; }
-  .btn-add { background: #FFFFFF; color: #16A34A; border: 1.5px solid #16A34A; padding: 5px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
-  .qty-box { display: flex; align-items: center; background: #16A34A; border-radius: 8px; overflow: hidden; }
+  .price { font-size: 15px; font-weight: 800; }
+  .btn-add { background: #fff; color: #16A34A; border: 1.5px solid #16A34A; padding: 5px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
+  .qty-box { display: flex; align-items: center; background: #16A34A; border-radius: 8px; }
   .qty-box button { background: none; border: none; color: #fff; font-weight: 800; padding: 5px 9px; font-size: 14px; cursor: pointer; }
   .qty-box span { color: #fff; font-weight: 800; font-size: 12px; padding: 0 4px; }
-  .out-badge { font-size: 11px; color: #DC2626; font-weight: 700; }
-  .cat-big-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
-  .cat-big-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; }
-  .cart-float { position: fixed; bottom: 64px; left: 10px; right: 10px; background: #16A34A; color: #fff; border-radius: 14px; padding: 10px 14px; display: none; justify-content: space-between; align-items: center; z-index: 150; cursor: pointer; }
-  .cart-float.locked { background: #1E293B; }
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 58px; background: #FFFFFF; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-around; align-items: center; z-index: 180; }
-  .nav-item { flex: 1; text-align: center; color: #64748B; font-size: 11px; font-weight: 700; cursor: pointer; padding: 6px 0; position: relative; }
-  .nav-item.active { color: #16A34A; }
-  .nav-icon { font-size: 19px; display: block; margin-bottom: 2px; }
-  .nav-badge { position: absolute; top: 3px; right: 26%; background: #DC2626; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 10px; display: none; }
-  .full-modal { position: fixed; inset: 0; background: #F4F6F9; display: none; flex-direction: column; z-index: 300; overflow-y: auto; padding-bottom: 90px; }
-  .modal-top { background: #FFFFFF; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 10; }
-  .back-btn { font-size: 20px; font-weight: 800; cursor: pointer; color: #0F172A; background: none; border: none; }
-  .box-card { background: #FFFFFF; margin: 12px; border-radius: 14px; padding: 14px; border: 1px solid #E2E8F0; }
-  .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F1F5F9; gap: 8px; }
-  .add-more-btn { width: 100%; background: #F8FAFC; border: 1.5px dashed #16A34A; color: #16A34A; font-weight: 800; font-size: 13px; padding: 10px; border-radius: 10px; margin-top: 10px; cursor: pointer; }
-  .field-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; display: block; }
-  .input-field { width: 100%; background: #FFFFFF; border: 1px solid #CBD5E1; color: #0F172A; padding: 11px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; }
-  .save-as-row { display: flex; gap: 8px; margin-bottom: 12px; }
-  .tag-chip { padding: 7px 14px; border-radius: 20px; border: 1px solid #CBD5E1; background: #fff; font-size: 12px; font-weight: 700; color: #475569; cursor: pointer; }
-  .tag-chip.active { background: #DCFCE7; border-color: #16A34A; color: #15803D; }
-  .photo-upload-box { border: 1.5px dashed #94A3B8; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; cursor: pointer; }
-  .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: #FFFFFF; padding: 12px 14px; border-top: 1px solid #E2E8F0; z-index: 320; }
-  .btn-green { width: 100%; background: #16A34A; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; }
-  .btn-green:disabled { background: #94A3B8; }
-  .order-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin: 12px; }
-  .progress-track { display: flex; justify-content: space-between; position: relative; margin: 14px 0 12px; }
-  .progress-track::before { content: ""; position: absolute; top: 9px; left: 12%; right: 12%; height: 3px; background: #E2E8F0; z-index: 1; }
-  .step { position: relative; z-index: 2; text-align: center; width: 33.3%; font-size: 11px; color: #94A3B8; font-weight: 600; }
-  .step-dot { width: 20px; height: 20px; border-radius: 50%; background: #E2E8F0; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
-  .step.active { color: #16A34A; font-weight: 800; }
-  .step.active .step-dot { background: #16A34A; }
-  .invoice-box { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
-  .inv-header { font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; border-bottom: 1px dashed #CBD5E1; padding-bottom: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; }
-  .inv-row { display: flex; justify-content: space-between; font-size: 13px; color: #1E293B; padding: 4px 0; gap: 10px; }
-  .inv-summary { border-top: 1px dashed #CBD5E1; margin-top: 6px; padding-top: 6px; }
-  .inv-sum-row { display: flex; justify-content: space-between; font-size: 12px; color: #475569; padding: 2px 0; }
-  .inv-total-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: 900; color: #16A34A; border-top: 1px solid #E2E8F0; margin-top: 4px; padding-top: 6px; }
+  .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
+  .cat-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; }
+  .cart-bar { position: fixed; bottom: 64px; left: 10px; right: 10px; background: #16A34A; color: #fff; border-radius: 14px; padding: 10px 14px; display: none; justify-content: space-between; align-items: center; z-index: 150; cursor: pointer; }
+  .cart-bar.locked { background: #1E293B; }
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; height: 58px; background: #fff; border-top: 1px solid #E2E8F0; display: flex; z-index: 180; }
+  .nav-btn { flex: 1; text-align: center; color: #64748B; font-size: 11px; font-weight: 700; padding: 6px 0; cursor: pointer; }
+  .nav-btn.active { color: #16A34A; }
+  .modal { position: fixed; inset: 0; background: #F4F6F9; display: none; flex-direction: column; z-index: 300; overflow-y: auto; padding-bottom: 85px; }
+  .m-top { background: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; }
+  .box { background: #fff; margin: 12px; border-radius: 14px; padding: 14px; border: 1px solid #E2E8F0; }
+  .inp { width: 100%; border: 1px solid #CBD5E1; padding: 10px 12px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; }
+  .cta { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 12px 14px; border-top: 1px solid #E2E8F0; z-index: 320; }
+  .btn-main { width: 100%; background: #16A34A; color: #fff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; }
+  .btn-main:disabled { background: #94A3B8; }
+  .inv-box { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px; margin: 8px 0; font-size: 13px; }
+  .inv-row { display: flex; justify-content: space-between; padding: 3px 0; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="top-bar">
-    <div class="brand-wrap">
-      <div class="logo">GO-GROC</div>
-      <span class="delivery-tag">⚡ Fast Delivery</span>
-    </div>
-    <div id="storeStatus" class="status-pill">● OPEN</div>
+    <div class="logo">GO-GROC ⚡</div>
+    <div id="storeStatus" class="pill">● OPEN</div>
   </div>
-  <div class="addr-strip" onclick="openAddressModal(false)">
-    <span id="headerAddrText">📍 Add House / Flat & Landmark in Makrana</span>
+  <div class="addr-bar" onclick="openAddr()">
+    <span id="hdrAddr">📍 Add Delivery Address in Makrana</span>
     <span style="color:#16A34A;font-weight:800;">Edit ▾</span>
   </div>
-  <input type="text" id="searchInput" class="search-box" placeholder="Search items..." oninput="onSearchInput()">
+  <input type="text" id="searchBox" class="search" placeholder="Search items..." oninput="renderItems()">
 </header>
 
-<div id="viewHome" class="view active">
-  <div id="dealsSection" style="display:none;">
+<div id="v-home" class="view active">
+  <div id="dealsWrap" style="display:none;">
     <div class="sec-head"><span class="sec-title">🔥 Today's Deals</span></div>
-    <div id="dealsRow" class="deals-scroll"></div>
+    <div id="dealsRow" class="cat-strip"></div>
   </div>
   <div class="sec-head">
     <span class="sec-title">Shop by Category</span>
-    <span class="sec-link" onclick="switchNav('categories')">See all →</span>
+    <span class="sec-link" onclick="goTab('cat')">See all →</span>
   </div>
-  <div id="homeCatStrip" class="cat-strip"></div>
+  <div id="catStrip" class="cat-strip"></div>
   <div class="sec-head">
-    <span id="gridHeading" class="sec-title">All Fresh Items</span>
-    <span id="clearFilterBtn" class="sec-link" style="display:none;" onclick="selectCategory('All')">Show All</span>
+    <span id="gridTitle" class="sec-title">All Fresh Items</span>
+    <span id="showAllBtn" class="sec-link" style="display:none;" onclick="setCat('All')">Show All</span>
   </div>
   <div id="itemsGrid" class="grid">
-    <p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px 0;">Loading store items...</p>
+    <p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px;">Loading store items...</p>
   </div>
 </div>
 
-<div id="viewCategories" class="view">
+<div id="v-cat" class="view">
   <div class="sec-head"><span class="sec-title">All Categories</span></div>
-  <div id="catBigGrid" class="cat-big-grid"></div>
+  <div id="catGrid" class="cat-grid"></div>
 </div>
 
-<div id="viewWishlist" class="view">
+<div id="v-wish" class="view">
   <div class="sec-head"><span class="sec-title">🔖 Saved Wishlist</span></div>
-  <div id="wishlistGrid" class="grid"></div>
+  <div id="wishGrid" class="grid"></div>
 </div>
 
-<div id="viewOrders" class="view">
-  <div class="box-card">
-    <label class="field-label">Track Orders & Invoices by Mobile Number</label>
+<div id="v-orders" class="view">
+  <div class="box">
+    <div style="font-size:12px;font-weight:700;margin-bottom:6px;">Track Orders & Invoices by Mobile</div>
     <div style="display:flex;gap:8px;">
-      <input type="tel" id="trackPhoneInput" class="input-field" style="margin-bottom:0;" placeholder="Enter 10-digit mobile number">
-      <button onclick="saveAndTrackPhone()" style="background:#16A34A;color:#fff;border:none;padding:0 16px;border-radius:10px;font-weight:800;">Track</button>
+      <input type="tel" id="trackPhone" class="inp" style="margin:0;" placeholder="10-digit mobile number">
+      <button onclick="trackByPhone()" style="background:#16A34A;color:#fff;border:none;padding:0 16px;border-radius:10px;font-weight:800;">Track</button>
     </div>
   </div>
   <div id="ordersList"></div>
 </div>
 
-<div id="cartFloat" class="cart-float" onclick="openCartModal()">
+<div id="cartBar" class="cart-bar" onclick="openCart()">
   <div>
-    <div id="cartFloatTitle" style="font-size:13px;font-weight:800;">0 Items | ₹0</div>
-    <div id="cartFloatSub" style="font-size:11px;">Add ₹99 more for minimum order</div>
+    <div id="cartTxt1" style="font-size:13px;font-weight:800;">0 Items</div>
+    <div id="cartTxt2" style="font-size:11px;">Min order ₹99</div>
   </div>
-  <div style="font-size:14px;font-weight:800;">View Cart →</div>
+  <div style="font-weight:800;">View Cart →</div>
 </div>
 
-<nav class="bottom-nav">
-  <div id="navHome" class="nav-item active" onclick="switchNav('home')"><span class="nav-icon">🏠</span>Home</div>
-  <div id="navCategories" class="nav-item" onclick="switchNav('categories')"><span class="nav-icon">📦</span>Categories</div>
-  <div id="navWishlist" class="nav-item" onclick="switchNav('wishlist')"><span id="wishBadge" class="nav-badge">0</span><span class="nav-icon">🔖</span>Wishlist</div>
-  <div id="navOrders" class="nav-item" onclick="switchNav('orders')"><span id="orderBadge" class="nav-badge">●</span><span class="nav-icon">🛵</span>Orders</div>
+<nav class="nav">
+  <div id="n-home" class="nav-btn active" onclick="goTab('home')"><div style="font-size:18px;">🏠</div>Home</div>
+  <div id="n-cat" class="nav-btn" onclick="goTab('cat')"><div style="font-size:18px;">📦</div>Categories</div>
+  <div id="n-wish" class="nav-btn" onclick="goTab('wish')"><div style="font-size:18px;">🔖</div>Wishlist</div>
+  <div id="n-orders" class="nav-btn" onclick="goTab('orders')"><div style="font-size:18px;">🛵</div>Orders</div>
 </nav>
 
-<div id="cartModal" class="full-modal">
-  <div class="modal-top">
-    <button class="back-btn" onclick="closeCartModal()">←</button>
-    <div>
-      <div style="font-size:16px;font-weight:800;">Your Cart</div>
-      <div style="font-size:11px;color:#16A34A;font-weight:700;">Minimum Order Value: ₹99 (+ ₹30 Delivery)</div>
-    </div>
+<div id="cartModal" class="modal">
+  <div class="m-top">
+    <button onclick="closeCart()" style="font-size:20px;border:none;background:none;font-weight:800;">←</button>
+    <b>Your Cart (Min ₹99 + ₹30 Delivery)</b>
   </div>
-  <div class="box-card">
-    <div id="fullCartList"></div>
-    <button class="add-more-btn" onclick="closeCartModal()">+ Add more items</button>
+  <div class="box" id="cartList"></div>
+  <div class="box">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><b>📍 Delivery Address</b><span onclick="openAddr()" style="color:#16A34A;font-weight:800;cursor:pointer;">Edit</span></div>
+    <div id="cartAddr" style="font-size:13px;color:#475569;">No address saved</div>
   </div>
-  <div class="box-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-      <span style="font-size:13px;font-weight:800;">📍 Delivery Address</span>
-      <span onclick="openAddressModal(true)" style="font-size:12px;font-weight:800;color:#16A34A;cursor:pointer;">Change / Add</span>
-    </div>
-    <div id="cartAddrPreview" style="font-size:13px;color:#475569;">No address saved yet.</div>
+  <div class="box">
+    <div class="inv-row"><span>Item Total</span><span id="bItem">₹0</span></div>
+    <div class="inv-row"><span>Delivery Charge</span><span>₹30</span></div>
+    <div class="inv-row" style="font-weight:900;font-size:16px;border-top:1px solid #E2E8F0;padding-top:8px;margin-top:4px;"><span>To Pay (COD)</span><span id="bTotal">₹0</span></div>
   </div>
-  <div class="box-card">
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#475569;"><span>Item Total</span><span id="billItemTotal">₹0</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:#0F172A;font-weight:700;"><span>Delivery Charge</span><span>₹30</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1px solid #E2E8F0;padding-top:8px;"><span>To Pay (COD)</span><span id="billGrandTotal">₹0</span></div>
-  </div>
-  <div class="sticky-cta"><button id="cartProceedBtn" class="btn-green" onclick="handleCartProceed()">Add address to proceed</button></div>
+  <div class="cta"><button id="orderBtn" class="btn-main" onclick="placeOrder()">Place COD Order</button></div>
 </div>
 
-<div id="addressModal" class="full-modal" style="z-index:350;">
-  <div class="modal-top">
-    <button class="back-btn" onclick="closeAddressModal()">←</button>
-    <div style="font-size:16px;font-weight:800;">Enter Complete Address</div>
+<div id="addrModal" class="modal" style="z-index:350;">
+  <div class="m-top">
+    <button onclick="closeAddr()" style="font-size:20px;border:none;background:none;font-weight:800;">←</button>
+    <b>Delivery Address</b>
   </div>
-  <div class="box-card">
-    <label class="field-label">House / Flat / Plot Number *</label>
-    <input type="text" id="addrHouse" class="input-field" placeholder="e.g., House No. 14">
-    <label class="field-label">Floor Number</label>
-    <input type="text" id="addrFloor" class="input-field" placeholder="e.g., Ground Floor">
-    <label class="field-label">Building / Street / Landmark *</label>
-    <input type="text" id="addrLandmark" class="input-field" placeholder="e.g., Station Road">
-    <label class="field-label">Area / Locality *</label>
-    <input type="text" id="addrArea" class="input-field" value="Makrana, Rajasthan">
-    <label class="field-label">Save Address As</label>
-    <div class="save-as-row">
-      <div class="tag-chip active" onclick="selectSaveAs(this, 'Home')">🏠 Home</div>
-      <div class="tag-chip" onclick="selectSaveAs(this, 'Work')">🏢 Work</div>
-      <div class="tag-chip" onclick="selectSaveAs(this, 'Other')">📍 Other</div>
-    </div>
+  <div class="box">
+    <input type="text" id="aHouse" class="inp" placeholder="House / Flat No. *">
+    <input type="text" id="aLand" class="inp" placeholder="Landmark / Street *">
+    <input type="text" id="aArea" class="inp" value="Makrana, Rajasthan">
+    <input type="text" id="aName" class="inp" placeholder="Receiver Name *">
+    <input type="tel" id="aPhone" class="inp" placeholder="10-digit Mobile Number *">
   </div>
-  <div class="box-card">
-    <label class="field-label">Receiver Name *</label>
-    <input type="text" id="custName" class="input-field" placeholder="Full Name">
-    <label class="field-label">Receiver Mobile Number *</label>
-    <input type="tel" id="custPhone" class="input-field" placeholder="10-digit Mobile Number">
-  </div>
-  <div class="box-card">
-    <label class="photo-upload-box">
-      <span id="doorPhotoLabel" style="font-size:13px;font-weight:700;color:#16A34A;">📷 Upload house photo (Optional)</span>
-      <input type="file" accept="image/*" style="display:none;" onchange="compressDoorPhoto(event)">
-      <img id="doorPhotoPreview" style="width:48px;height:48px;border-radius:8px;object-fit:cover;display:none;">
-    </label>
-  </div>
-  <div class="sticky-cta"><button class="btn-green" onclick="saveAddressAndProceed()">Save Address & Continue</button></div>
+  <div class="cta"><button class="btn-main" onclick="saveAddr()">Save Address</button></div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-var DELIVERY_FEE = 30;
-var CATEGORIES = [
-  { name: "Vegetables & Fruits", icon: "🥦" },
-  { name: "Dairy & Bread", icon: "🥛" },
-  { name: "Atta, Rice & Dal", icon: "🌾" },
-  { name: "Snacks & Drinks", icon: "🍟" },
-  { name: "Fast Food", icon: "🍔" },
-  { name: "Daily Essentials", icon: "🧴" }
+var FEE = 30;
+var CATS = [
+  { n: "Vegetables & Fruits", i: "🥦" },
+  { n: "Dairy & Bread", i: "🥛" },
+  { n: "Atta, Rice & Dal", i: "🌾" },
+  { n: "Snacks & Drinks", i: "🍟" },
+  { n: "Fast Food", i: "🍔" },
+  { n: "Daily Essentials", i: "🧴" }
 ];
 
-function safeParse(k, f) {
-  try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch (e) { return f; }
+function loadJSON(k, d) {
+  try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; }
 }
 
-var db = null;
-var allItems = [];
-var isLoaded = false;
-var allOrders = [];
-var cart = safeParse("gogroc_cart", {});
-var wishlist = safeParse("gogroc_wishlist", []);
-var savedProfile = safeParse("gogroc_profile", null);
-var selectedCategory = "All";
-var saveAsTag = "Home";
-var doorPhotoBase64 = "";
-var isStoreOpen = true;
-var proceedAfterAddr = false;
+var db = null, items = [], orders = [], loaded = false, isOpen = true, curCat = "All";
+var cart = loadJSON("gg_cart", {});
+var wish = loadJSON("gg_wish", []);
+var prof = loadJSON("gg_prof", null);
 
-function buildCategories() {
-  var strip = document.getElementById("homeCatStrip");
-  var big = document.getElementById("catBigGrid");
-  strip.innerHTML = "";
-  big.innerHTML = "";
-  CATEGORIES.forEach(function(c) {
-    var chip = document.createElement("div");
-    chip.className = "cat-chip";
-    chip.setAttribute("data-cat", c.name);
-    chip.innerHTML = "<div class='cat-icon'>" + c.icon + "</div><div class='cat-label'>" + c.name + "</div>";
-    chip.onclick = function() { selectCategory(c.name); };
-    strip.appendChild(chip);
+function initUI() {
+  var s = document.getElementById("catStrip");
+  var g = document.getElementById("catGrid");
+  CATS.forEach(function(c) {
+    var d1 = document.createElement("div");
+    d1.className = "cat-chip";
+    d1.setAttribute("data-c", c.n);
+    d1.innerHTML = "<div class='cat-icon'>" + c.i + "</div><div class='cat-label'>" + c.n + "</div>";
+    d1.onclick = function() { setCat(c.n); };
+    s.appendChild(d1);
 
-    var card = document.createElement("div");
-    card.className = "cat-big-card";
-    card.innerHTML = "<div style='font-size:36px;margin-bottom:8px;'>" + c.icon + "</div><div style='font-size:14px;font-weight:800;'>" + c.name + "</div>";
-    card.onclick = function() { selectCategory(c.name); switchNav("home"); };
-    big.appendChild(card);
+    var d2 = document.createElement("div");
+    d2.className = "cat-card";
+    d2.innerHTML = "<div style='font-size:34px;margin-bottom:6px;'>" + c.i + "</div><b>" + c.n + "</b>";
+    d2.onclick = function() { setCat(c.n); goTab("home"); };
+    g.appendChild(d2);
   });
+  syncProf();
 }
 
-function syncProfileUI() {
-  if (savedProfile && savedProfile.house) {
-    document.getElementById("headerAddrText").textContent = "📍 " + (savedProfile.tag || "Home") + ": " + savedProfile.house + ", " + savedProfile.landmark;
-    document.getElementById("cartAddrPreview").innerHTML = "<b>" + savedProfile.name + " (" + savedProfile.phone + ")</b><br>" + savedProfile.house + ", " + savedProfile.landmark + ", " + savedProfile.area;
-    document.getElementById("addrHouse").value = savedProfile.house || "";
-    document.getElementById("addrFloor").value = savedProfile.floor || "";
-    document.getElementById("addrLandmark").value = savedProfile.landmark || "";
-    document.getElementById("addrArea").value = savedProfile.area || "Makrana, Rajasthan";
-    document.getElementById("custName").value = savedProfile.name || "";
-    document.getElementById("custPhone").value = savedProfile.phone || "";
-    document.getElementById("trackPhoneInput").value = savedProfile.phone || "";
+function syncProf() {
+  if (!prof) return;
+  document.getElementById("hdrAddr").textContent = "📍 " + prof.house + ", " + prof.land;
+  document.getElementById("cartAddr").innerHTML = "<b>" + prof.name + " (" + prof.phone + ")</b><br>" + prof.house + ", " + prof.land + ", " + prof.area;
+  document.getElementById("aHouse").value = prof.house || "";
+  document.getElementById("aLand").value = prof.land || "";
+  document.getElementById("aArea").value = prof.area || "Makrana, Rajasthan";
+  document.getElementById("aName").value = prof.name || "";
+  document.getElementById("aPhone").value = prof.phone || "";
+  document.getElementById("trackPhone").value = prof.phone || "";
+}
+
+function goTab(t) {
+  ["home", "cat", "wish", "orders"].forEach(function(x) {
+    document.getElementById("v-" + x).className = (x === t) ? "view active" : "view";
+    document.getElementById("n-" + x).className = (x === t) ? "nav-btn active" : "nav-btn";
+  });
+  if (t === "wish") renderWish();
+  if (t === "orders") renderOrders();
+}
+
+function setCat(c) {
+  curCat = c;
+  document.querySelectorAll(".cat-chip").forEach(function(el) {
+    el.classList.toggle("active", el.getAttribute("data-c") === c);
+  });
+  document.getElementById("gridTitle").textContent = c === "All" ? "All Fresh Items" : c;
+  document.getElementById("showAllBtn").style.display = c === "All" ? "none" : "inline";
+  renderItems();
+}
+
+function makeCard(it) {
+  var q = cart[it.id] || 0;
+  var ok = it.inStock !== false;
+  var w = wish.indexOf(it.id) !== -1;
+  var deal = it.mrp && Number(it.mrp) > Number(it.price);
+
+  var card = document.createElement("div");
+  card.className = "card";
+
+  var wb = document.createElement("div");
+  wb.className = "wish-btn";
+  wb.textContent = w ? "❤️" : "🔖";
+  wb.onclick = function() {
+    var idx = wish.indexOf(it.id);
+    if (idx !== -1) wish.splice(idx, 1); else wish.push(it.id);
+    localStorage.setItem("gg_wish", JSON.stringify(wish));
+    renderAll();
+  };
+  card.appendChild(wb);
+
+  var ib = document.createElement("div");
+  ib.className = "img-box";
+  if (it.image && it.image.length > 10) {
+    var img = document.createElement("img"); img.src = it.image; ib.appendChild(img);
+  } else {
+    ib.textContent = it.emoji || "🛒";
+  }
+  card.appendChild(ib);
+
+  var bd = document.createElement("div");
+  bd.className = "c-body";
+  bd.innerHTML = "<div class='c-cat'>" + (it.category || "Grocery") + "</div><div class='c-name'>" + it.name + "</div><div class='c-desc'>" + (it.desc || "") + "</div>";
+
+  var pr = document.createElement("div");
+  pr.className = "p-row";
+  pr.innerHTML = "<div>" + (deal ? "<span class='mrp'>₹" + it.mrp + "</span>" : "") + "<span class='price'>₹" + it.price + "</span></div>";
+
+  if (!ok) {
+    pr.innerHTML += "<span style='font-size:11px;color:#DC2626;font-weight:700;'>Out of Stock</span>";
+  } else if (q === 0) {
+    var b = document.createElement("button"); b.className = "btn-add"; b.textContent = "ADD";
+    b.onclick = function() { addQty(it.id, 1); };
+    pr.appendChild(b);
+  } else {
+    var qb = document.createElement("div"); qb.className = "qty-box";
+    var b1 = document.createElement("button"); b1.textContent = "−"; b1.onclick = function() { addQty(it.id, -1); };
+    var sp = document.createElement("span"); sp.textContent = q;
+    var b2 = document.createElement("button"); b2.textContent = "+"; b2.onclick = function() { addQty(it.id, 1); };
+    qb.appendChild(b1); qb.appendChild(sp); qb.appendChild(b2);
+    pr.appendChild(qb);
+  }
+  bd.appendChild(pr);
+  card.appendChild(bd);
+  return card;
+}
+
+function renderItems() {
+  if (!loaded) return;
+  var q = document.getElementById("searchBox").value.toLowerCase();
+  var grid = document.getElementById("itemsGrid");
+  grid.innerHTML = "";
+  var list = items.filter(function(i) {
+    return (i.name || "").toLowerCase().indexOf(q) !== -1 && (curCat === "All" || (i.category || "Daily Essentials") === curCat);
+  });
+  if (!list.length) {
+    grid.innerHTML = "<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px;'>No items found</p>";
+    return;
+  }
+  list.forEach(function(it) { grid.appendChild(makeCard(it)); });
+}
+
+function renderWish() {
+  var grid = document.getElementById("wishGrid");
+  grid.innerHTML = "";
+  var list = items.filter(function(i) { return wish.indexOf(i.id) !== -1; });
+  if (!list.length) {
+    grid.innerHTML = "<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px;'>Wishlist is empty</p>";
+    return;
+  }
+  list.forEach(function(it) { grid.appendChild(makeCard(it)); });
+}
+
+function addQty(id, d) {
+  if (!isOpen) { alert("Store is closed!"); return; }
+  cart[id] = (cart[id] || 0) + d;
+  if (cart[id] <= 0) delete cart[id];
+  localStorage.setItem("gg_cart", JSON.stringify(cart));
+  renderAll();
+  if (document.getElementById("cartModal").style.display === "flex") renderCart();
+}
+
+function totals() {
+  var c = 0, sub = 0;
+  for (var id in cart) {
+    var it = items.find(function(x) { return x.id === id; });
+    if (it) { c += cart[id]; sub += Number(it.price) * cart[id]; }
+  }
+  return { c: c, sub: sub, tot: sub + FEE };
+}
+
+function renderAll() {
+  renderItems();
+  renderWish();
+  var t = totals();
+  var bar = document.getElementById("cartBar");
+  if (t.c === 0) { bar.style.display = "none"; closeCart(); return; }
+  bar.style.display = "flex";
+  document.getElementById("cartTxt1").textContent = t.c + " Items | ₹" + t.sub + " (+ ₹" + FEE + " Delivery)";
+  if (t.sub < 99) {
+    bar.classList.add("locked");
+    document.getElementById("cartTxt2").textContent = "Add ₹" + (99 - t.sub) + " more (Min ₹99)";
+  } else {
+    bar.classList.remove("locked");
+    document.getElementById("cartTxt2").textContent = "✓ Total ₹" + t.tot + " • Tap to order";
   }
 }
 
-function switchNav(tab) {
-  ["home", "categories", "wishlist", "orders"].forEach(function(t) {
-    var cap = t.charAt(0).toUpperCase() + t.slice(1);
-    document.getElementById("view" + cap).class
+function openCart() { renderCart(); document.getElementById("cartModal").style.display = "flex"; }
+function closeCart() { document.getElementById("cartModal").style.display = "none"; }
+
+function renderCart() {
+  var t = totals();
+  var box = document.getElementById("cartList");
+  box.innerHTML = "";
+  for (var id in cart) {
+    var it = items.find(function(x) { return x.id === id; });
+    if (!it) continue;
+    var row = document.createElement("div");
+    row.style.cssText = "display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F1F5F9;";
+    row.innerHTML = "<div><b>" + it.name + "</b><div style='font-size:12px;color:#64748B;'>₹" + it.price + " × " + cart[id] + " = ₹" + (it.price * cart[id]) + "</div></div>";
+    var qb = document.createElement("div"); qb.className = "qty-box";
+    (function(iid, q) {
+      var b1 = document.createElement("button"); b1.textContent = "−"; b1.onclick = function() { addQty(iid, -1); };
+      var sp = document.createElement("span"); sp.textContent = q;
+      var b2 = document.createElement("button"); b2.textContent = "+"; b2.onclick = function() { addQty(iid, 1); };
+      qb.appendChild(b1); qb.appendChild(sp); qb.appendChild(b2);
+    })(id, cart[id]);
+    row.appendChild(qb);
+    box.appendChild(row);
+  }
+  document.getElementById("bItem").textContent = "₹" + t.sub;
+  document.getElementById("bTotal").textContent = "₹" + t.tot;
+  var btn = document.getElementById("orderBtn");
+  if (t.sub < 99) { btn.disabled = true; btn.textContent = "Add ₹" + (99 - t.sub) + " more (Min ₹99)"; }
+  else if (!prof) { btn.disabled = false; btn.textContent = "Add Address to Order"; }
+  else { btn.disabled = false; btn.textContent = "Place COD Order • ₹" + t.tot; }
+}
+
+function openAddr() { document.getElementById("addrModal").style.display = "flex"; }
+function closeAddr() { document.getElementById("addrModal").style.display = "none"; }
+
+function saveAddr() {
+  var h = document.getElementById("aHouse").value.trim();
+  var l = document.getElementById("aLand").value.trim();
+  var a = document.getElementById("aArea").value.trim();
+  var n = document.getElementById("aName").value.trim();
+  var p = document.getElementById("aPhone").value.trim();
+  if (!h || !l || !n || !p) { alert("Fill all fields!"); return; }
+  prof = { house: h, land: l, area: a, name: n, phone: p };
+  localStorage.setItem("gg_prof", JSON.stringify(prof));
+  syncProf();
+  closeAddr();
+  if (document.getElementById("cartModal").style.display === "flex") renderCart();
+}
+
+function placeOrder() {
+  var t = totals();
+  if (t.sub < 99) return;
+  if (!prof) { openAddr(); 
