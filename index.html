@@ -8,7 +8,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
   body { background: #F4F6F9; color: #1A1D24; padding-bottom: 135px; }
 
-  /* Header */
   header { background: #FFFFFF; padding: 12px 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .brand-wrap { display: flex; align-items: center; gap: 8px; }
@@ -19,23 +18,19 @@
   .addr-strip { display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 6px 10px; margin-bottom: 8px; font-size: 12px; color: #334155; cursor: pointer; }
   .search-box { width: 100%; background: #F1F5F9; border: 1px solid #E2E8F0; color: #0F172A; padding: 10px 14px; border-radius: 10px; font-size: 14px; outline: none; }
 
-  /* Views */
   .view { display: none; }
   .view.active { display: block; }
 
-  /* Section Titles */
   .sec-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 14px 8px; }
   .sec-title { font-size: 16px; font-weight: 800; color: #0F172A; }
   .sec-link { font-size: 12px; font-weight: 700; color: #16A34A; cursor: pointer; }
 
-  /* Horizontal Deals Strip */
   .deals-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 14px 10px; scrollbar-width: none; }
   .deals-scroll::-webkit-scrollbar { display: none; }
   .deal-card { min-width: 145px; max-width: 145px; background: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%); border: 1px solid #DBEAFE; border-radius: 12px; padding: 8px; position: relative; flex-shrink: 0; }
   .deal-tag { position: absolute; top: 6px; left: 6px; background: #2563EB; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
   .deal-card img { width: 100%; height: 82px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; background: #E2E8F0; }
 
-  /* Horizontal Category Chips */
   .cat-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 14px 10px; scrollbar-width: none; }
   .cat-strip::-webkit-scrollbar { display: none; }
   .cat-chip { min-width: 78px; text-align: center; cursor: pointer; flex-shrink: 0; }
@@ -43,7 +38,6 @@
   .cat-chip.active .cat-icon { background: #DCFCE7; border-color: #16A34A; }
   .cat-label { font-size: 11px; font-weight: 700; color: #334155; line-height: 1.2; }
 
-  /* Product Grid */
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 14px 14px; }
   .card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
   .wish-icon { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.92); border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 5; }
@@ -61,37 +55,31 @@
   .qty-box span { color: #fff; font-weight: 800; font-size: 12px; padding: 0 4px; }
   .out-badge { font-size: 11px; color: #DC2626; font-weight: 700; }
 
-  /* Categories Grid View */
   .cat-big-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
   .cat-big-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; }
   .cat-big-card div:first-child { font-size: 36px; margin-bottom: 8px; }
   .cat-big-card div:last-child { font-size: 14px; font-weight: 800; color: #0F172A; }
 
-  /* Floating Cart + ₹99 Min Order Bar */
   .cart-float { position: fixed; bottom: 64px; left: 10px; right: 10px; background: #16A34A; color: #fff; border-radius: 14px; padding: 10px 14px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 6px 20px rgba(22,163,74,0.35); z-index: 150; cursor: pointer; }
   .cart-float.locked { background: #1E293B; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
 
-  /* Bottom Navigation Bar */
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 58px; background: #FFFFFF; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-around; align-items: center; z-index: 180; }
   .nav-item { flex: 1; text-align: center; color: #64748B; font-size: 11px; font-weight: 700; cursor: pointer; padding: 6px 0; position: relative; }
   .nav-item.active { color: #16A34A; }
   .nav-icon { font-size: 19px; display: block; margin-bottom: 2px; }
   .nav-badge { position: absolute; top: 3px; right: 26%; background: #DC2626; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 10px; display: none; }
 
-  /* Full Screen Modals (Cart & Address) */
   .full-modal { position: fixed; inset: 0; background: #F4F6F9; display: none; flex-direction: column; z-index: 300; overflow-y: auto; padding-bottom: 90px; }
   .modal-top { background: #FFFFFF; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 10; }
   .back-btn { font-size: 20px; font-weight: 800; cursor: pointer; color: #0F172A; background: none; border: none; }
   .box-card { background: #FFFFFF; margin: 12px; border-radius: 14px; padding: 14px; border: 1px solid #E2E8F0; }
 
-  /* Full Cart Item Row */
   .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F1F5F9; gap: 8px; }
   .cart-row:last-child { border-bottom: none; }
   .cart-row-info { flex: 1; }
   .cart-wish-btn { background: #F8FAFC; border: 1px solid #E2E8F0; color: #475569; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; margin-top: 4px; cursor: pointer; display: inline-block; }
   .add-more-btn { width: 100%; background: #F8FAFC; border: 1.5px dashed #16A34A; color: #16A34A; font-weight: 800; font-size: 13px; padding: 10px; border-radius: 10px; margin-top: 10px; cursor: pointer; }
 
-  /* Detailed Address Form */
   .field-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; display: block; }
   .input-field { width: 100%; background: #FFFFFF; border: 1px solid #CBD5E1; color: #0F172A; padding: 11px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; outline: none; }
   .input-field:focus { border-color: #16A34A; }
@@ -103,7 +91,6 @@
   .btn-green { width: 100%; background: #16A34A; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; }
   .btn-green:disabled { background: #94A3B8; cursor: not-allowed; }
 
-  /* Order Tracking Cards */
   .order-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin: 12px; }
   .progress-track { display: flex; justify-content: space-between; position: relative; margin: 14px 0 10px; }
   .progress-track::before { content: ""; position: absolute; top: 9px; left: 12%; right: 12%; height: 3px; background: #E2E8F0; z-index: 1; }
@@ -130,7 +117,6 @@
   <input type="text" id="searchInput" class="search-box" placeholder="Search 'milk', 'atta', 'burger', 'chips'..." oninput="onSearchInput()">
 </header>
 
-<!-- HOME VIEW -->
 <div id="viewHome" class="view active">
   <div id="dealsSection" style="display:none;">
     <div class="sec-head">
@@ -155,19 +141,16 @@
   </div>
 </div>
 
-<!-- CATEGORIES VIEW -->
 <div id="viewCategories" class="view">
   <div class="sec-head"><span class="sec-title">All Categories</span></div>
   <div id="catBigGrid" class="cat-big-grid"></div>
 </div>
 
-<!-- WISHLIST VIEW -->
 <div id="viewWishlist" class="view">
   <div class="sec-head"><span class="sec-title">🔖 Saved Wishlist</span></div>
   <div id="wishlistGrid" class="grid"></div>
 </div>
 
-<!-- TRACK ORDER VIEW -->
 <div id="viewOrders" class="view">
   <div class="box-card">
     <label class="field-label">Track Orders by Mobile Number</label>
@@ -179,7 +162,6 @@
   <div id="ordersList"></div>
 </div>
 
-<!-- FLOATING CART BAR (₹99 MINIMUM ORDER) -->
 <div id="cartFloat" class="cart-float" onclick="openCartModal()">
   <div>
     <div id="cartFloatTitle" style="font-size:13px;font-weight:800;">0 Items | ₹0</div>
@@ -188,7 +170,6 @@
   <div id="cartFloatAction" style="font-size:14px;font-weight:800;">View Cart →</div>
 </div>
 
-<!-- BOTTOM NAVIGATION BAR -->
 <nav class="bottom-nav">
   <div id="navHome" class="nav-item active" onclick="switchNav('home')">
     <span class="nav-icon">🏠</span>Home
@@ -206,7 +187,6 @@
   </div>
 </nav>
 
-<!-- FULL CART SCREEN MODAL -->
 <div id="cartModal" class="full-modal">
   <div class="modal-top">
     <button class="back-btn" onclick="closeCartModal()">←</button>
@@ -246,7 +226,6 @@
   </div>
 </div>
 
-<!-- DETAILED ADDRESS FORM MODAL -->
 <div id="addressModal" class="full-modal" style="z-index:350;">
   <div class="modal-top">
     <button class="back-btn" onclick="closeAddressModal()">←</button>
@@ -302,9 +281,14 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, onSnapshot, addDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const firebaseConfig = { projectId: "go-groc-f488d" };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  function safeParse(key, fallback) {
+    try {
+      const val = localStorage.getItem(key);
+      return val ? JSON.parse(val) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
 
   const CATEGORIES = [
     { name: "Vegetables & Fruits", icon: "🥦" },
@@ -315,25 +299,34 @@
     { name: "Daily Essentials", icon: "🧴" }
   ];
 
+  // Render Category Strips immediately before Firebase connects
+  document.getElementById("homeCatStrip").innerHTML = CATEGORIES.map(c =>
+    `<div class="cat-chip" data-cat="${c.name}" onclick="selectCategory('${c.name}')"><div class="cat-icon">${c.icon}</div><div class="cat-label">${c.name}</div></div>`
+  ).join("");
+
+  document.getElementById("catBigGrid").innerHTML = CATEGORIES.map(c =>
+    `<div class="cat-big-card" onclick="selectCategory('${c.name}'); switchNav('home');"><div>${c.icon}</div><div>${c.name}</div></div>`
+  ).join("");
+
+  const firebaseConfig = { projectId: "go-groc-f488d" };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   let allItems = [];
   let allOrders = [];
-  let cart = JSON.parse(localStorage.getItem("gogroc_cart") || "{}");
-  let wishlist = JSON.parse(localStorage.getItem("gogroc_wishlist") || "[]");
-  let savedProfile = JSON.parse(localStorage.getItem("gogroc_profile") || "null");
+  let cart = safeParse("gogroc_cart", {});
+  let wishlist = safeParse("gogroc_wishlist", []);
+  let savedProfile = safeParse("gogroc_profile", null);
   let selectedCategory = "All";
   let saveAsTag = "Home";
   let doorPhotoBase64 = "";
   let isStoreOpen = true;
   let proceedAfterAddr = false;
 
-  // Populate saved profile if exists
   function syncProfileUI() {
     if (savedProfile && savedProfile.house) {
       const shortTxt = `${savedProfile.tag || 'Home'}: ${savedProfile.house}, ${savedProfile.landmark}`;
       document.getElementById("headerAddrText").textContent = "📍 " + shortTxt;
-      document.getElementById("cartAddrPreview").innerHTML = `
-        <b>${savedProfile.name} (${savedProfile.phone})</b><br>
-        ${savedProfile.house}${savedProfile.floor ? ', Floor ' + savedProfile.floor : ''}, ${savedProfile.landmark}, ${savedProfile.area}
-      `;
+      document.getElementById("cartAddrPreview").innerHTML = `<b>${savedProfile.name} (${savedProfile.phone})</b><br>${savedProfile.house}${savedProfile.floor ? ', Floor ' + savedProfile.floor : ''}, ${savedProfile.landmark}, ${savedProfile.area}`;
       document.getElementById("addrHouse").value = savedProfile.house || "";
-      
+      document.getEl
