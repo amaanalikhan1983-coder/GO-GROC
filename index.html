@@ -10,7 +10,7 @@
   header { background: #FFFFFF; padding: 12px 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .brand-wrap { display: flex; align-items: center; gap: 8px; }
-  .logo { color: #16A34A; font-size: 21px; font-weight: 900; letter-spacing: -0.3px; }
+  .logo { color: #16A34A; font-size: 21px; font-weight: 900; }
   .delivery-tag { background: #ECFDF5; color: #15803D; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
   .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: #DCFCE7; color: #15803D; font-weight: 700; }
   .status-closed { background: #FEE2E2; color: #DC2626; }
@@ -21,28 +21,26 @@
   .sec-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 14px 8px; }
   .sec-title { font-size: 16px; font-weight: 800; color: #0F172A; }
   .sec-link { font-size: 12px; font-weight: 700; color: #16A34A; cursor: pointer; }
-  .deals-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 14px 10px; scrollbar-width: none; }
-  .deals-scroll::-webkit-scrollbar { display: none; }
-  .deal-card { min-width: 145px; max-width: 145px; background: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%); border: 1px solid #DBEAFE; border-radius: 12px; padding: 8px; position: relative; flex-shrink: 0; }
+  .deals-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 14px 10px; }
+  .deal-card { min-width: 145px; max-width: 145px; background: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 12px; padding: 8px; position: relative; flex-shrink: 0; }
   .deal-tag { position: absolute; top: 6px; left: 6px; background: #2563EB; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
   .deal-emoji { width: 100%; height: 76px; background: #FFFFFF; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; font-size: 38px; overflow: hidden; }
   .deal-emoji img { width: 100%; height: 100%; object-fit: cover; }
-  .cat-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 14px 10px; scrollbar-width: none; }
-  .cat-strip::-webkit-scrollbar { display: none; }
+  .cat-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 14px 10px; }
   .cat-chip { min-width: 78px; text-align: center; cursor: pointer; flex-shrink: 0; }
-  .cat-icon { width: 58px; height: 58px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+  .cat-icon { width: 58px; height: 58px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 5px; }
   .cat-chip.active .cat-icon { background: #DCFCE7; border-color: #16A34A; }
-  .cat-label { font-size: 11px; font-weight: 700; color: #334155; line-height: 1.2; }
+  .cat-label { font-size: 11px; font-weight: 700; color: #334155; }
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 14px 14px; }
-  .card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
-  .wish-icon { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.95); border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 5; }
+  .card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+  .wish-icon { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 5; }
   .card-img-box { width: 100%; height: 110px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; font-size: 46px; overflow: hidden; }
   .card-img-box img { width: 100%; height: 100%; object-fit: cover; }
   .card-body { padding: 10px; }
   .item-cat { font-size: 10px; font-weight: 700; color: #16A34A; text-transform: uppercase; margin-bottom: 2px; }
-  .item-name { font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 3px; line-height: 1.3; }
-  .item-desc { font-size: 11px; color: #64748B; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .price-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+  .item-name { font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 3px; }
+  .item-desc { font-size: 11px; color: #64748B; margin-bottom: 8px; }
+  .price-row { display: flex; justify-content: space-between; align-items: center; }
   .mrp { font-size: 11px; color: #94A3B8; text-decoration: line-through; display: block; }
   .price { font-size: 15px; font-weight: 800; color: #0F172A; }
   .btn-add { background: #FFFFFF; color: #16A34A; border: 1.5px solid #16A34A; padding: 5px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
@@ -52,10 +50,8 @@
   .out-badge { font-size: 11px; color: #DC2626; font-weight: 700; }
   .cat-big-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
   .cat-big-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; }
-  .cat-big-card div:first-child { font-size: 36px; margin-bottom: 8px; }
-  .cat-big-card div:last-child { font-size: 14px; font-weight: 800; color: #0F172A; }
-  .cart-float { position: fixed; bottom: 64px; left: 10px; right: 10px; background: #16A34A; color: #fff; border-radius: 14px; padding: 10px 14px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 6px 20px rgba(22,163,74,0.35); z-index: 150; cursor: pointer; }
-  .cart-float.locked { background: #1E293B; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+  .cart-float { position: fixed; bottom: 64px; left: 10px; right: 10px; background: #16A34A; color: #fff; border-radius: 14px; padding: 10px 14px; display: none; justify-content: space-between; align-items: center; z-index: 150; cursor: pointer; }
+  .cart-float.locked { background: #1E293B; }
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 58px; background: #FFFFFF; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-around; align-items: center; z-index: 180; }
   .nav-item { flex: 1; text-align: center; color: #64748B; font-size: 11px; font-weight: 700; cursor: pointer; padding: 6px 0; position: relative; }
   .nav-item.active { color: #16A34A; }
@@ -66,20 +62,17 @@
   .back-btn { font-size: 20px; font-weight: 800; cursor: pointer; color: #0F172A; background: none; border: none; }
   .box-card { background: #FFFFFF; margin: 12px; border-radius: 14px; padding: 14px; border: 1px solid #E2E8F0; }
   .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F1F5F9; gap: 8px; }
-  .cart-row:last-child { border-bottom: none; }
-  .cart-row-info { flex: 1; }
-  .cart-wish-btn { background: #F8FAFC; border: 1px solid #E2E8F0; color: #475569; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; margin-top: 4px; cursor: pointer; display: inline-block; }
   .add-more-btn { width: 100%; background: #F8FAFC; border: 1.5px dashed #16A34A; color: #16A34A; font-weight: 800; font-size: 13px; padding: 10px; border-radius: 10px; margin-top: 10px; cursor: pointer; }
   .field-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; display: block; }
-  .input-field { width: 100%; background: #FFFFFF; border: 1px solid #CBD5E1; color: #0F172A; padding: 11px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; outline: none; }
+  .input-field { width: 100%; background: #FFFFFF; border: 1px solid #CBD5E1; color: #0F172A; padding: 11px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; }
   .save-as-row { display: flex; gap: 8px; margin-bottom: 12px; }
   .tag-chip { padding: 7px 14px; border-radius: 20px; border: 1px solid #CBD5E1; background: #fff; font-size: 12px; font-weight: 700; color: #475569; cursor: pointer; }
   .tag-chip.active { background: #DCFCE7; border-color: #16A34A; color: #15803D; }
   .photo-upload-box { border: 1.5px dashed #94A3B8; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; cursor: pointer; }
   .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: #FFFFFF; padding: 12px 14px; border-top: 1px solid #E2E8F0; z-index: 320; }
   .btn-green { width: 100%; background: #16A34A; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; }
-  .btn-green:disabled { background: #94A3B8; cursor: not-allowed; }
-  .order-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+  .btn-green:disabled { background: #94A3B8; }
+  .order-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin: 12px; }
   .progress-track { display: flex; justify-content: space-between; position: relative; margin: 14px 0 12px; }
   .progress-track::before { content: ""; position: absolute; top: 9px; left: 12%; right: 12%; height: 3px; background: #E2E8F0; z-index: 1; }
   .step { position: relative; z-index: 2; text-align: center; width: 33.3%; font-size: 11px; color: #94A3B8; font-weight: 600; }
@@ -88,18 +81,13 @@
   .step.active .step-dot { background: #16A34A; }
   .invoice-box { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
   .inv-header { font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase; border-bottom: 1px dashed #CBD5E1; padding-bottom: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; }
-  .inv-row { display: flex; justify-content: space-between; align-items: flex-start; font-size: 13px; color: #1E293B; padding: 4px 0; gap: 10px; }
-  .inv-item-name { flex: 1; line-height: 1.3; }
-  .inv-item-rate { font-size: 11px; color: #64748B; display: block; }
-  .inv-item-amt { font-weight: 700; white-space: nowrap; color: #0F172A; }
+  .inv-row { display: flex; justify-content: space-between; font-size: 13px; color: #1E293B; padding: 4px 0; gap: 10px; }
   .inv-summary { border-top: 1px dashed #CBD5E1; margin-top: 6px; padding-top: 6px; }
   .inv-sum-row { display: flex; justify-content: space-between; font-size: 12px; color: #475569; padding: 2px 0; }
   .inv-total-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: 900; color: #16A34A; border-top: 1px solid #E2E8F0; margin-top: 4px; padding-top: 6px; }
 </style>
 </head>
 <body>
-
-<div id="errBanner" style="display:none;background:#FEE2E2;color:#B91C1C;padding:10px;font-size:12px;font-weight:700;"></div>
 
 <header>
   <div class="top-bar">
@@ -113,24 +101,19 @@
     <span id="headerAddrText">📍 Add House / Flat & Landmark in Makrana</span>
     <span style="color:#16A34A;font-weight:800;">Edit ▾</span>
   </div>
-  <input type="text" id="searchInput" class="search-box" placeholder="Search 'milk', 'atta', 'burger', 'chips'..." oninput="onSearchInput()">
+  <input type="text" id="searchInput" class="search-box" placeholder="Search items..." oninput="onSearchInput()">
 </header>
 
 <div id="viewHome" class="view active">
   <div id="dealsSection" style="display:none;">
-    <div class="sec-head">
-      <span class="sec-title">🔥 Today's Deals</span>
-      <span style="font-size:11px;color:#2563EB;font-weight:700;">Best Prices</span>
-    </div>
+    <div class="sec-head"><span class="sec-title">🔥 Today's Deals</span></div>
     <div id="dealsRow" class="deals-scroll"></div>
   </div>
-
   <div class="sec-head">
     <span class="sec-title">Shop by Category</span>
     <span class="sec-link" onclick="switchNav('categories')">See all →</span>
   </div>
   <div id="homeCatStrip" class="cat-strip"></div>
-
   <div class="sec-head">
     <span id="gridHeading" class="sec-title">All Fresh Items</span>
     <span id="clearFilterBtn" class="sec-link" style="display:none;" onclick="selectCategory('All')">Show All</span>
@@ -164,7 +147,7 @@
 <div id="cartFloat" class="cart-float" onclick="openCartModal()">
   <div>
     <div id="cartFloatTitle" style="font-size:13px;font-weight:800;">0 Items | ₹0</div>
-    <div id="cartFloatSub" style="font-size:11px;opacity:0.9;">Add ₹99 more for minimum order</div>
+    <div id="cartFloatSub" style="font-size:11px;">Add ₹99 more for minimum order</div>
   </div>
   <div style="font-size:14px;font-weight:800;">View Cart →</div>
 </div>
@@ -193,12 +176,12 @@
       <span style="font-size:13px;font-weight:800;">📍 Delivery Address</span>
       <span onclick="openAddressModal(true)" style="font-size:12px;font-weight:800;color:#16A34A;cursor:pointer;">Change / Add</span>
     </div>
-    <div id="cartAddrPreview" style="font-size:13px;color:#475569;line-height:1.4;">No address saved yet. Tap "Add address to proceed" below.</div>
+    <div id="cartAddrPreview" style="font-size:13px;color:#475569;">No address saved yet.</div>
   </div>
   <div class="box-card">
     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#475569;"><span>Item Total</span><span id="billItemTotal">₹0</span></div>
     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:#0F172A;font-weight:700;"><span>Delivery Charge</span><span>₹30</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1px solid #E2E8F0;padding-top:8px;"><span>To Pay (Cash on Delivery)</span><span id="billGrandTotal">₹0</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1px solid #E2E8F0;padding-top:8px;"><span>To Pay (COD)</span><span id="billGrandTotal">₹0</span></div>
   </div>
   <div class="sticky-cta"><button id="cartProceedBtn" class="btn-green" onclick="handleCartProceed()">Add address to proceed</button></div>
 </div>
@@ -210,11 +193,11 @@
   </div>
   <div class="box-card">
     <label class="field-label">House / Flat / Plot Number *</label>
-    <input type="text" id="addrHouse" class="input-field" placeholder="e.g., House No. 14, Near Masjid">
+    <input type="text" id="addrHouse" class="input-field" placeholder="e.g., House No. 14">
     <label class="field-label">Floor Number</label>
-    <input type="text" id="addrFloor" class="input-field" placeholder="e.g., Ground Floor / 1st Floor">
+    <input type="text" id="addrFloor" class="input-field" placeholder="e.g., Ground Floor">
     <label class="field-label">Building / Street / Landmark *</label>
-    <input type="text" id="addrLandmark" class="input-field" placeholder="e.g., Station Road, Opp. Water Tank">
+    <input type="text" id="addrLandmark" class="input-field" placeholder="e.g., Station Road">
     <label class="field-label">Area / Locality *</label>
     <input type="text" id="addrArea" class="input-field" value="Makrana, Rajasthan">
     <label class="field-label">Save Address As</label>
@@ -225,30 +208,24 @@
     </div>
   </div>
   <div class="box-card">
-    <div style="font-size:14px;font-weight:800;margin-bottom:10px;">Receiver Details</div>
-    <label class="field-label">Receiver's Name *</label>
+    <label class="field-label">Receiver Name *</label>
     <input type="text" id="custName" class="input-field" placeholder="Full Name">
-    <label class="field-label">Receiver's Mobile Number *</label>
+    <label class="field-label">Receiver Mobile Number *</label>
     <input type="tel" id="custPhone" class="input-field" placeholder="10-digit Mobile Number">
   </div>
   <div class="box-card">
-    <div style="font-size:14px;font-weight:800;margin-bottom:4px;">Door / Building Photo (Optional)</div>
-    <div style="font-size:12px;color:#64748B;margin-bottom:10px;">Helps our delivery partner find your house faster without extra calls</div>
     <label class="photo-upload-box">
-      <span id="doorPhotoLabel" style="font-size:13px;font-weight:700;color:#16A34A;">📷 Tap to upload house/gate photo</span>
+      <span id="doorPhotoLabel" style="font-size:13px;font-weight:700;color:#16A34A;">📷 Upload house photo (Optional)</span>
       <input type="file" accept="image/*" style="display:none;" onchange="compressDoorPhoto(event)">
       <img id="doorPhotoPreview" style="width:48px;height:48px;border-radius:8px;object-fit:cover;display:none;">
     </label>
   </div>
-  <div class="sticky-cta"><button id="saveAddrBtn" class="btn-green" onclick="saveAddressAndProceed()">Save Address & Continue</button></div>
+  <div class="sticky-cta"><button class="btn-green" onclick="saveAddressAndProceed()">Save Address & Continue</button></div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-window.onerror = function(msg, src, line) {
-  var b = document.getElementById("errBanner");
-  if (b) { b.style.display = "block"; b.textContent = "Error: " + msg + " (Line " + line + ")"; }
-};
-
 var DELIVERY_FEE = 30;
 var CATEGORIES = [
   { name: "Vegetables & Fruits", icon: "🥦" },
@@ -265,7 +242,7 @@ function safeParse(k, f) {
 
 var db = null;
 var allItems = [];
-var isLoadedFromServer = false;
+var isLoaded = false;
 var allOrders = [];
 var cart = safeParse("gogroc_cart", {});
 var wishlist = safeParse("gogroc_wishlist", []);
@@ -276,5 +253,42 @@ var doorPhotoBase64 = "";
 var isStoreOpen = true;
 var proceedAfterAddr = false;
 
-function initCategories() {
-  var 
+function buildCategories() {
+  var strip = document.getElementById("homeCatStrip");
+  var big = document.getElementById("catBigGrid");
+  strip.innerHTML = "";
+  big.innerHTML = "";
+  CATEGORIES.forEach(function(c) {
+    var chip = document.createElement("div");
+    chip.className = "cat-chip";
+    chip.setAttribute("data-cat", c.name);
+    chip.innerHTML = "<div class='cat-icon'>" + c.icon + "</div><div class='cat-label'>" + c.name + "</div>";
+    chip.onclick = function() { selectCategory(c.name); };
+    strip.appendChild(chip);
+
+    var card = document.createElement("div");
+    card.className = "cat-big-card";
+    card.innerHTML = "<div style='font-size:36px;margin-bottom:8px;'>" + c.icon + "</div><div style='font-size:14px;font-weight:800;'>" + c.name + "</div>";
+    card.onclick = function() { selectCategory(c.name); switchNav("home"); };
+    big.appendChild(card);
+  });
+}
+
+function syncProfileUI() {
+  if (savedProfile && savedProfile.house) {
+    document.getElementById("headerAddrText").textContent = "📍 " + (savedProfile.tag || "Home") + ": " + savedProfile.house + ", " + savedProfile.landmark;
+    document.getElementById("cartAddrPreview").innerHTML = "<b>" + savedProfile.name + " (" + savedProfile.phone + ")</b><br>" + savedProfile.house + ", " + savedProfile.landmark + ", " + savedProfile.area;
+    document.getElementById("addrHouse").value = savedProfile.house || "";
+    document.getElementById("addrFloor").value = savedProfile.floor || "";
+    document.getElementById("addrLandmark").value = savedProfile.landmark || "";
+    document.getElementById("addrArea").value = savedProfile.area || "Makrana, Rajasthan";
+    document.getElementById("custName").value = savedProfile.name || "";
+    document.getElementById("custPhone").value = savedProfile.phone || "";
+    document.getElementById("trackPhoneInput").value = savedProfile.phone || "";
+  }
+}
+
+function switchNav(tab) {
+  ["home", "categories", "wishlist", "orders"].forEach(function(t) {
+    var cap = t.charAt(0).toUpperCase() + t.slice(1);
+    document.getElementById("view" + cap).class
