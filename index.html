@@ -264,8 +264,10 @@ function renderCart(){
   document.getElementById("bTot").textContent="₹"+t.tot;
   var btn=document.getElementById("oBtn");
   if(t.sub<99){btn.disabled=true;btn.textContent="Add ₹"+(99-t.sub)+" more (Min ₹99)"}
-  else if(!prof||!prof.house){btn.disabled=false;btn.textContent
-                              function openAddr(){document.getElementById("addrModal").style.display="flex"}
+  else if(!prof||!prof.house){btn.disabled=false;btn.textContent="Add Address to Order"}
+  else{btn.disabled=false;btn.textContent="Place COD Order • ₹"+t.tot}
+}
+function openAddr(){document.getElementById("addrModal").style.display="flex"}
 function closeAddr(){document.getElementById("addrModal").style.display="none"}
 function saveAddr(){
   var h=document.getElementById("aHouse").value.trim(),l=document.getElementById("aLand").value.trim(),a=document.getElementById("aArea").value.trim(),n=document.getElementById("aName").value.trim(),p=document.getElementById("aPhone").value.trim();
@@ -301,6 +303,7 @@ function renderOrders(){
     return"<div class='box'><div style='display:flex;justify-content:space-between;margin-bottom:6px'><b>#"+o.id.slice(0,6).toUpperCase()+"</b><span class='pill'>"+(o.status||"Placed")+"</span></div><div class='ibox2'>"+rows+"<div class='irow' style='border-top:1px dashed #CBD5E1;margin-top:4px;padding-top:4px'><span>Delivery Charge</span><span>₹"+del+"</span></div><div class='irow' style='font-weight:900;color:#16A34A'><span>Grand Total (COD)</span><span>₹"+o.total+"</span></div></div><div style='font-size:12px;color:#64748B'>📍 "+(o.address||"")+"</div></div>";
   }).join("");
 }
+
 try{
   firebase.initializeApp({projectId:"go-groc-f488d"});
   db=firebase.firestore();
