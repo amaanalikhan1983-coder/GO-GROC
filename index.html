@@ -25,13 +25,13 @@
   .dtag{position:absolute;top:6px;left:6px;background:#2563EB;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:5px}
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:6px 14px 14px}
   .card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;position:relative}
-  .wbtn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
-  .ibox{width:100%;height:105px;background:#F8FAFC;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden}
+  .wbtn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;z-index:2}
+  .ibox{width:100%;height:105px;background:#F8FAFC;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden;cursor:pointer}
   .ibox img{width:100%;height:100%;object-fit:cover}
   .cbd{padding:10px}
   .ccat{font-size:10px;font-weight:700;color:#16A34A;text-transform:uppercase}
-  .cname{font-size:13px;font-weight:700;margin:2px 0}
-  .cdesc{font-size:11px;color:#64748B;margin-bottom:8px}
+  .cname{font-size:13px;font-weight:700;margin:2px 0;cursor:pointer}
+  .cdesc{font-size:11px;color:#64748B;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .prow{display:flex;justify-content:space-between;align-items:center}
   .mrp{font-size:11px;color:#94A3B8;text-decoration:line-through;display:block}
   .price{font-size:15px;font-weight:800}
@@ -58,6 +58,16 @@
   .stp{position:relative;z-index:2;text-align:center;width:25%;font-size:10px;color:#94A3B8;font-weight:700}
   .sdot{width:20px;height:20px;border-radius:50%;background:#E2E8F0;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px}
   .stp.on{color:#16A34A}.stp.on .sdot{background:#16A34A}
+  /* Product Detail Modal */
+  .pd-hero{position:relative;width:100%;height:290px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:110px;overflow:hidden}
+  .pd-hero img{width:100%;height:100%;object-fit:cover}
+  .pd-top-btns{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+  .pd-circle{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.95);border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .pd-meta{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700}
+  .pd-off{background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;margin-left:6px}
+  .pd-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+  .pd-bitem{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;color:#334155}
+  .pd-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:12px 16px;border-top:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center;z-index:360}
 </style>
 </head>
 <body>
@@ -116,6 +126,54 @@
   <div id="n-orders" class="nbtn" onclick="goTab('orders')"><div style="font-size:18px">🛵</div>Orders</div>
 </nav>
 
+<!-- Product Detail Modal -->
+<div id="pdModal" class="modal" style="z-index:260">
+  <div class="pd-hero">
+    <div class="pd-top-btns">
+      <button class="pd-circle" onclick="closeDetail()">⌄</button>
+      <div style="display:flex;gap:8px">
+        <button id="pdWishBtn" class="pd-circle" onclick="toggleDetailWish()">🔖</button>
+        <button class="pd-circle" onclick="shareDetail()">📤</button>
+      </div>
+    </div>
+    <div id="pdMedia" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div>
+  </div>
+  <div class="pd-meta">
+    <span style="color:#16A34A">⚡ Fast Delivery in Makrana</span>
+    <span style="color:#F59E0B">★ 4.8 <span style="color:#64748B;font-weight:500">(Freshly Prepared)</span></span>
+  </div>
+  <div class="box">
+    <div id="pdCatLink" style="font-size:12px;font-weight:800;color:#16A34A;margin-bottom:6px;cursor:pointer"></div>
+    <div id="pdName" style="font-size:19px;font-weight:900;color:#0F172A;margin-bottom:8px;line-height:1.25"></div>
+    <div style="display:flex;align-items:baseline;gap:6px">
+      <span id="pdPrice" style="font-size:20px;font-weight:900;color:#0F172A"></span>
+      <span id="pdMrp" class="mrp" style="display:inline;font-size:13px"></span>
+      <span id="pdOff" class="pd-off" style="display:none"></span>
+    </div>
+  </div>
+  <div class="box">
+    <div style="font-size:13px;font-weight:800;margin-bottom:6px">Product Details</div>
+    <div id="pdDesc" style="font-size:13px;color:#475569;line-height:1.5"></div>
+  </div>
+  <div class="box">
+    <div class="pd-badges">
+      <div class="pd-bitem"><div style="font-size:20px;margin-bottom:4px">✨</div>100% Fresh</div>
+      <div class="pd-bitem"><div style="font-size:20px;margin-bottom:4px">🛵</div>Fast Delivery</div>
+      <div class="pd-bitem"><div style="font-size:20px;margin-bottom:4px">💵</div>Cash on Delivery</div>
+    </div>
+  </div>
+  <div class="pd-footer">
+    <div>
+      <div style="font-size:11px;color:#64748B;font-weight:700">Item Price</div>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <span id="pdFootPrice" style="font-size:18px;font-weight:900"></span>
+        <span id="pdFootMrp" class="mrp" style="display:inline;font-size:12px"></span>
+      </div>
+    </div>
+    <div id="pdAction"></div>
+  </div>
+</div>
+
 <div id="cartModal" class="modal">
   <div class="mtop"><button onclick="closeCart()" style="font-size:20px;border:none;background:none;font-weight:800">←</button><b>Your Cart (Min ₹99 + ₹30 Delivery)</b></div>
   <div class="box" id="cList"></div>
@@ -145,7 +203,7 @@
 <script>
 var FEE=30;
 function rJ(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
-var db=null,items=[],orders=[],loaded=false,isOpen=true,curCat="All",cart=rJ("gg_cart",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
+var db=null,items=[],orders=[],loaded=false,isOpen=true,curCat="All",detailId=null,cart=rJ("gg_cart",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
 
 function syncProf(){
   if(!prof||!prof.house)return;
@@ -175,17 +233,89 @@ function setCat(c){
   document.getElementById("allBtn").style.display=c==="All"?"none":"inline";
   renderItems();
 }
+
+function openDetail(id){
+  var it=items.find(function(x){return x.id===id});
+  if(!it)return;
+  detailId=id;
+  var med=document.getElementById("pdMedia");
+  med.innerHTML=(it.image&&it.image.length>10)?"<img src='"+it.image+"'>":(it.emoji||"🛒");
+  var cat=it.category||"Daily Essentials";
+  var cl=document.getElementById("pdCatLink");
+  cl.textContent="Explore all "+cat+" >";
+  cl.onclick=function(){closeDetail();setCat(cat);goTab("home")};
+  document.getElementById("pdName").textContent=it.name;
+  document.getElementById("pdPrice").textContent="₹"+it.price;
+  document.getElementById("pdFootPrice").textContent="₹"+it.price;
+  var hasMrp=it.mrp&&Number(it.mrp)>Number(it.price);
+  document.getElementById("pdMrp").textContent=hasMrp?"₹"+it.mrp:"";
+  document.getElementById("pdFootMrp").textContent=hasMrp?"₹"+it.mrp:"";
+  var offEl=document.getElementById("pdOff");
+  if(hasMrp){
+    offEl.style.display="inline-block";
+    offEl.textContent=Math.round(((it.mrp-it.price)/it.mrp)*100)+"% OFF";
+  }else{offEl.style.display="none"}
+  document.getElementById("pdDesc").textContent=it.desc||"Freshly prepared and delivered fast to your doorstep in Makrana.";
+  renderDetailControls();
+  document.getElementById("pdModal").style.display="flex";
+}
+function closeDetail(){detailId=null;document.getElementById("pdModal").style.display="none"}
+function toggleDetailWish(){
+  if(!detailId)return;
+  var idx=wish.indexOf(detailId);
+  if(idx!==-1)wish.splice(idx,1);else wish.push(detailId);
+  localStorage.setItem("gg_wish",JSON.stringify(wish));
+  renderAll();
+}
+function shareDetail(){
+  var it=items.find(function(x){return x.id===detailId});
+  if(!it)return;
+  var txt=it.name+" - ₹"+it.price+" on GO-GROC Makrana!";
+  if(navigator.share)navigator.share({title:it.name,text:txt,url:location.href}).catch(function(){});
+  else alert(txt);
+}
+function renderDetailControls(){
+  if(!detailId)return;
+  var it=items.find(function(x){return x.id===detailId});
+  if(!it)return;
+  document.getElementById("pdWishBtn").textContent=wish.indexOf(detailId)!==-1?"❤️":"🔖";
+  var act=document.getElementById("pdAction");
+  act.innerHTML="";
+  var q=cart[detailId]||0;
+  if(it.inStock===false){
+    act.innerHTML="<span style='color:#DC2626;font-weight:800;font-size:13px'>Out of Stock</span>";
+  }else if(q===0){
+    var b=document.createElement("button");
+    b.style.cssText="background:#16A34A;color:#fff;border:none;padding:11px 32px;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer";
+    b.textContent="ADD";
+    b.onclick=function(){addQty(detailId,1)};
+    act.appendChild(b);
+  }else{
+    var qb=document.createElement("div");qb.className="qbox";qb.style.padding="3px 6px";
+    var b1=document.createElement("button");b1.style.fontSize="18px";b1.textContent="−";b1.onclick=function(){addQty(detailId,-1)};
+    var sp=document.createElement("span");sp.style.fontSize="15px";sp.textContent=q;
+    var b2=document.createElement("button");b2.style.fontSize="18px";b2.textContent="+";b2.onclick=function(){addQty(detailId,1)};
+    qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);
+    act.appendChild(qb);
+  }
+}
+
 function makeCard(it){
   var q=cart[it.id]||0,ok=it.inStock!==false,w=wish.indexOf(it.id)!==-1,deal=it.mrp&&Number(it.mrp)>Number(it.price);
   var card=document.createElement("div");card.className="card";
   var wb=document.createElement("div");wb.className="wbtn";wb.textContent=w?"❤️":"🔖";
-  wb.onclick=function(){var idx=wish.indexOf(it.id);if(idx!==-1)wish.splice(idx,1);else wish.push(it.id);localStorage.setItem("gg_wish",JSON.stringify(wish));renderAll()};
+  wb.onclick=function(e){e.stopPropagation();var idx=wish.indexOf(it.id);if(idx!==-1)wish.splice(idx,1);else wish.push(it.id);localStorage.setItem("gg_wish",JSON.stringify(wish));renderAll()};
   card.appendChild(wb);
   var ib=document.createElement("div");ib.className="ibox";
+  ib.onclick=function(){openDetail(it.id)};
   if(it.image&&it.image.length>10){var img=document.createElement("img");img.src=it.image;ib.appendChild(img)}else{ib.textContent=it.emoji||"🛒"}
   card.appendChild(ib);
   var bd=document.createElement("div");bd.className="cbd";
-  bd.innerHTML="<div class='ccat'>"+(it.category||"Grocery")+"</div><div class='cname'>"+it.name+"</div><div class='cdesc'>"+(it.desc||"")+"</div>";
+  var topInfo=document.createElement("div");
+  topInfo.onclick=function(){openDetail(it.id)};
+  topInfo.innerHTML="<div class='ccat'>"+(it.category||"Grocery")+"</div><div class='cname'>"+it.name+"</div><div class='cdesc'>"+(it.desc||"")+"</div>";
+  bd.appendChild(topInfo);
+
   var pr=document.createElement("div");pr.className="prow";
   pr.innerHTML="<div>"+(deal?"<span class='mrp'>₹"+it.mrp+"</span>":"")+"<span class='price'>₹"+it.price+"</span></div>";
   if(!ok){pr.innerHTML+="<span style='font-size:11px;color:#DC2626;font-weight:700'>Out of Stock</span>"}
@@ -207,7 +337,10 @@ function renderDeals(){
   deals.forEach(function(it){
     var off=Math.round(((it.mrp-it.price)/it.mrp)*100),q=cart[it.id]||0;
     var dc=document.createElement("div");dc.className="dcard";
-    dc.innerHTML="<span class='dtag'>"+off+"% OFF</span><div class='ibox' style='height:72px;border-radius:8px;margin-bottom:5px'>"+(it.image&&it.image.length>10?"<img src='"+it.image+"'>":(it.emoji||"🛒"))+"</div><div style='font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px'>"+it.name+"</div>";
+    var clickArea=document.createElement("div");
+    clickArea.onclick=function(){openDetail(it.id)};
+    clickArea.innerHTML="<span class='dtag'>"+off+"% OFF</span><div class='ibox' style='height:72px;border-radius:8px;margin-bottom:5px'>"+(it.image&&it.image.length>10?"<img src='"+it.image+"'>":(it.emoji||"🛒"))+"</div><div style='font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px'>"+it.name+"</div>";
+    dc.appendChild(clickArea);
     var bot=document.createElement("div");bot.style.cssText="display:flex;justify-content:space-between;align-items:center";
     bot.innerHTML="<div><span class='mrp'>₹"+it.mrp+"</span><b>₹"+it.price+"</b></div>";
     if(q===0){var b=document.createElement("button");b.className="badd";b.style.padding="4px 10px";b.textContent="ADD";b.onclick=function(){addQty(it.id,1)};bot.appendChild(b)}
@@ -241,6 +374,7 @@ function totals(){
 }
 function renderAll(){
   renderDeals();renderItems();renderWish();
+  if(detailId)renderDetailControls();
   var t=totals(),bar=document.getElementById("cBar");
   if(t.c===0){bar.style.display="none";closeCart();return}
   bar.style.display="flex";
@@ -248,7 +382,7 @@ function renderAll(){
   if(t.sub<99){bar.classList.add("locked");document.getElementById("cTxt2").textContent="Add ₹"+(99-t.sub)+" more (Min ₹99)"}
   else{bar.classList.remove("locked");document.getElementById("cTxt2").textContent="✓ Total ₹"+t.tot+" • Tap to order"}
 }
-function openCart(){renderCart();document.getElementById("cartModal").style.display="flex"}
+function openCart(){closeDetail();renderCart();document.getElementById("cartModal").style.display="flex"}
 function closeCart(){document.getElementById("cartModal").style.display="none"}
 function renderCart(){
   var t=totals(),box=document.getElementById("cList");box.innerHTML="";
