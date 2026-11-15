@@ -7,8 +7,9 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
   body { background: #121212; color: #fff; padding-bottom: 40px; }
-  header { background: #1A1A1A; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2A2A2A; }
+  header { background: #1A1A1A; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2A2A2A; gap: 8px; }
   .logo { color: #2ECC71; font-size: 20px; font-weight: 800; }
+  .hdr-btns { display: flex; gap: 6px; align-items: center; }
   .tabs { display: flex; background: #1A1A1A; border-bottom: 1px solid #2A2A2A; }
   .tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; font-size: 14px; color: #888; cursor: pointer; border-bottom: 3px solid transparent; }
   .tab.active { color: #2ECC71; border-bottom-color: #2ECC71; }
@@ -32,16 +33,23 @@
   .menu-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .toggle-btn { padding: 6px 9px; border-radius: 8px; border: none; font-weight: 700; font-size: 11px; cursor: pointer; }
   .inv-line { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
+  .alert-banner { display: none; background: #DC2626; color: #fff; text-align: center; padding: 10px; font-weight: 800; font-size: 14px; animation: pulse 0.8s infinite alternate; }
+  @keyframes pulse { from { opacity: 1; } to { opacity: 0.7; } }
 </style>
 </head>
-<body>
+<body onclick="unlockAudio()">
+
+<div id="newOrderBanner" class="alert-banner" onclick="this.style.display='none'">🚨 NEW ORDER RECEIVED! (Tap to dismiss)</div>
 
 <header>
   <div>
     <div class="logo">GO-GROC</div>
     <div style="font-size:11px;color:#999;">ADMIN PANEL</div>
   </div>
-  <button id="storeToggleBtn" onclick="toggleStore()" style="background:#2ECC71;color:#000;border:none;padding:8px 14px;border-radius:20px;font-weight:800;font-size:12px;">STORE OPEN</button>
+  <div class="hdr-btns">
+    <button id="soundToggleBtn" onclick="toggleSound(event)" style="background:#F1C40F;color:#000;border:none;padding:8px 10px;border-radius:20px;font-weight:800;font-size:11px;cursor:pointer;">🔔 SOUND ON</button>
+    <button id="storeToggleBtn" onclick="toggleStore()" style="background:#2ECC71;color:#000;border:none;padding:8px 12px;border-radius:20px;font-weight:800;font-size:11px;cursor:pointer;">STORE OPEN</button>
+  </div>
 </header>
 
 <div class="tabs">
@@ -94,6 +102,60 @@
   var currentEmoji = "";
   var allMenuDocs = [];
 
+  // --- LOUD ORDER BUZZER / RINGTONE SYSTEM ---
+  var soundEnabled = true;
+  var audioCtx = null;
+  var initialOrdersLoaded = false;
+  var knownOrderIds = {};
+
+  function unlockAudio() {
+    if (!audioCtx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+  }
+
+  function playLoudOrderBuzzer() {
+    if (!soundEnabled) return;
+    unlockAudio();
+    if (!audioCtx) return;
+
+    if (navigator.vibrate) {
+      navigator.vibrate([400, 150, 400, 150, 600]);
+    }
+
+    var now = audioCtx.currentTime;
+    var freqs = [880, 1174.66, 880, 1174.66, 987.77, 1318.51];
+    for (var i = 0; i < freqs.length; i++) {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(freqs[i], now + i * 0.22);
+
+      gain.gain.setValueAtTime(0.001, now + i * 0.22);
+      gain.gain.exponentialRampToValueAtTime(0.9, now + i * 0.22 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.22 + 0.20);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + i * 0.22);
+      osc.stop(now + i * 0.22 + 0.21);
+    }
+  }
+
+  function toggleSound(e) {
+    if (e) e.stopPropagation();
+    soundEnabled = !soundEnabled;
+    var btn = document.getElementById("soundToggleBtn");
+    btn.textContent = soundEnabled ? "🔔 SOUND ON" : "🔕 MUTED";
+    btn.style.background = soundEnabled ? "#F1C40F" : "#444";
+    btn.style.color = soundEnabled ? "#000" : "#ccc";
+    if (soundEnabled) playLoudOrderBuzzer();
+  }
+
   var STARTER_ITEMS = [
     { name: "Fresh Aloo (Potato) 1 kg", category: "Vegetables & Fruits", mrp: 40, price: 28, emoji: "🥔", desc: "Farm fresh sorted potatoes" },
     { name: "Red Onion (Pyaz) 1 kg", category: "Vegetables & Fruits", mrp: 45, price: 32, emoji: "🧅", desc: "Fresh Nashik red onions" },
@@ -137,6 +199,21 @@
   }
 
   db.collection("orders").orderBy("createdAt", "desc").onSnapshot(function(snap) {
+    var hasNewOrder = false;
+    snap.docs.forEach(function(d) {
+      if (!knownOrderIds[d.id]) {
+        knownOrderIds[d.id] = true;
+        if (initialOrdersLoaded) hasNewOrder = true;
+      }
+    });
+    initialOrdersLoaded = true;
+
+    if (hasNewOrder) {
+      playLoudOrderBuzzer();
+      document.getElementById("newOrderBanner").style.display = "block";
+      switchTab("orders");
+    }
+
     var container = document.getElementById("ordersList");
     if (snap.empty) {
       container.innerHTML = '<p style="text-align:center;color:#777;padding:30px;">No orders yet.</p>';
