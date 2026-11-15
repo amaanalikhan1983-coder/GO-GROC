@@ -21,6 +21,8 @@
   .cicon{width:56px;height:56px;border-radius:14px;background:#fff;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:25px;margin:0 auto 4px}
   .chip.active .cicon{background:#DCFCE7;border-color:#16A34A}
   .clbl{font-size:11px;font-weight:700;color:#334155}
+  .dcard{min-width:140px;max-width:140px;background:#EFF6FF;border:1px solid #DBEAFE;border-radius:12px;padding:8px;position:relative;flex-shrink:0}
+  .dtag{position:absolute;top:6px;left:6px;background:#2563EB;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:5px}
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:6px 14px 14px}
   .card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;position:relative}
   .wbtn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
@@ -61,21 +63,15 @@
 </header>
 
 <div id="v-home" class="view active">
+  <div id="dWrap" style="display:none"><div class="head"><b>🔥 Today's Deals</b></div><div id="dRow" class="strip"></div></div>
   <div class="head"><b>Shop by Category</b><span style="font-size:12px;font-weight:700;color:#16A34A;cursor:pointer" onclick="goTab('cat')">See all →</span></div>
   <div id="catStrip" class="strip"></div>
   <div class="head"><b id="gTitle">All Fresh Items</b><span id="allBtn" style="display:none;font-size:12px;font-weight:700;color:#16A34A;cursor:pointer" onclick="setCat('All')">Show All</span></div>
-  <div id="iGrid" class="grid"><p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px">Loading items...</p></div>
+  <div id="iGrid" class="grid"><p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px">Connecting to store...</p></div>
 </div>
 
-<div id="v-cat" class="view">
-  <div class="head"><b>All Categories</b></div>
-  <div id="cGrid" class="grid"></div>
-</div>
-
-<div id="v-wish" class="view">
-  <div class="head"><b>🔖 Saved Wishlist</b></div>
-  <div id="wGrid" class="grid"></div>
-</div>
+<div id="v-cat" class="view"><div class="head"><b>All Categories</b></div><div id="cGrid" class="grid"></div></div>
+<div id="v-wish" class="view"><div class="head"><b>🔖 Saved Wishlist</b></div><div id="wGrid" class="grid"></div></div>
 
 <div id="v-orders" class="view">
   <div class="box">
@@ -121,6 +117,8 @@
   <div class="cta"><button class="bmain" onclick="saveAddr()">Save Address</button></div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 var FEE=30,CATS=[{n:"Vegetables & Fruits",i:"🥦"},{n:"Dairy & Bread",i:"🥛"},{n:"Atta, Rice & Dal",i:"🌾"},{n:"Snacks & Drinks",i:"🍟"},{n:"Fast Food",i:"🍔"},{n:"Daily Essentials",i:"🧴"}];
 function rJ(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
@@ -139,11 +137,12 @@ function initUI(){
   syncProf();
 }
 function syncProf(){
-  if(!prof)return;
-  document.getElementById("hdrAddr").textContent="📍 "+prof.house+", "+prof.land;
-  document.getElementById("cAddr").innerHTML="<b>"+prof.name+" ("+prof.phone+")</b><br>"+prof.house+", "+prof.land+", "+prof.area;
+  if(!prof||!prof.house)return;
+  var lm=prof.land||prof.landmark||"";
+  document.getElementById("hdrAddr").textContent="📍 "+prof.house+(lm?", "+lm:"");
+  document.getElementById("cAddr").innerHTML="<b>"+(prof.name||"")+" ("+(prof.phone||"")+")</b><br>"+prof.house+", "+lm+", "+(prof.area||"Makrana");
   document.getElementById("aHouse").value=prof.house||"";
-  document.getElementById("aLand").value=prof.land||"";
+  document.getElementById("aLand").value=lm;
   document.getElementById("aArea").value=prof.area||"Makrana, Rajasthan";
   document.getElementById("aName").value=prof.name||"";
   document.getElementById("aPhone").value=prof.phone||"";
@@ -187,11 +186,27 @@ function makeCard(it){
   }
   bd.appendChild(pr);card.appendChild(bd);return card;
 }
+function renderDeals(){
+  var deals=items.filter(function(i){return i.mrp&&Number(i.mrp)>Number(i.price)&&i.inStock!==false});
+  var w=document.getElementById("dWrap"),r=document.getElementById("dRow");
+  if(!deals.length){w.style.display="none";return}
+  w.style.display="block";r.innerHTML="";
+  deals.forEach(function(it){
+    var off=Math.round(((it.mrp-it.price)/it.mrp)*100),q=cart[it.id]||0;
+    var dc=document.createElement("div");dc.className="dcard";
+    dc.innerHTML="<span class='dtag'>"+off+"% OFF</span><div class='ibox' style='height:72px;border-radius:8px;margin-bottom:5px'>"+(it.image&&it.image.length>10?"<img src='"+it.image+"'>":(it.emoji||"🛒"))+"</div><div style='font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px'>"+it.name+"</div>";
+    var bot=document.createElement("div");bot.style.cssText="display:flex;justify-content:space-between;align-items:center";
+    bot.innerHTML="<div><span class='mrp'>₹"+it.mrp+"</span><b>₹"+it.price+"</b></div>";
+    if(q===0){var b=document.createElement("button");b.className="badd";b.style.padding="4px 10px";b.textContent="ADD";b.onclick=function(){addQty(it.id,1)};bot.appendChild(b)}
+    else{var qb=document.createElement("div");qb.className="qbox";var b1=document.createElement("button");b1.textContent="−";b1.onclick=function(){addQty(it.id,-1)};var sp=document.createElement("span");sp.textContent=q;var b2=document.createElement("button");b2.textContent="+";b2.onclick=function(){addQty(it.id,1)};qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);bot.appendChild(qb)}
+    dc.appendChild(bot);r.appendChild(dc);
+  });
+}
 function renderItems(){
   if(!loaded)return;
   var q=document.getElementById("sBox").value.toLowerCase(),grid=document.getElementById("iGrid");grid.innerHTML="";
   var list=items.filter(function(i){return(i.name||"").toLowerCase().indexOf(q)!==-1&&(curCat==="All"||(i.category||"Daily Essentials")===curCat)});
-  if(!list.length){grid.innerHTML="<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px'>No items found</p>";return}
+  if(!list.length){grid.innerHTML="<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px'>No items in store yet</p>";return}
   list.forEach(function(it){grid.appendChild(makeCard(it))});
 }
 function renderWish(){
@@ -212,7 +227,7 @@ function totals(){
   return{c:c,sub:sub,tot:sub+FEE};
 }
 function renderAll(){
-  renderItems();renderWish();
+  renderDeals();renderItems();renderWish();
   var t=totals(),bar=document.getElementById("cBar");
   if(t.c===0){bar.style.display="none";closeCart();return}
   bar.style.display="flex";
@@ -241,7 +256,7 @@ function renderCart(){
   document.getElementById("bTot").textContent="₹"+t.tot;
   var btn=document.getElementById("oBtn");
   if(t.sub<99){btn.disabled=true;btn.textContent="Add ₹"+(99-t.sub)+" more (Min ₹99)"}
-  else if(!prof){btn.disabled=false;btn.textContent="Add Address to Order"}
+  else if(!prof||!prof.house){btn.disabled=false;btn.textContent="Add Address to Order"}
   else{btn.disabled=false;btn.textContent="Place COD Order • ₹"+t.tot}
 }
 function openAddr(){document.getElementById("addrModal").style.display="flex"}
@@ -253,38 +268,9 @@ function saveAddr(){
   syncProf();closeAddr();if(document.getElementById("cartModal").style.display==="flex")renderCart();
 }
 function placeOrder(){
-  var t=totals();if(t.sub<99)return;if(!prof){openAddr();return}if(!db){alert("Connecting...");return}
+  var t=totals();if(t.sub<99)return;if(!prof||!prof.house){openAddr();return}if(!db){alert("Not connected to server");return}
   var btn=document.getElementById("oBtn");btn.disabled=true;btn.textContent="Placing...";
   var list=[];for(var id in cart){var it=items.find(function(x){return x.id===id});if(it)list.push({name:it.name,qty:cart[id],price:Number(it.price)})}
   db.collection("orders").add({
-    customerName:prof.name,phone:prof.phone,address:prof.house+", "+prof.land+", "+prof.area,
-    items:list,itemTotal:t.sub,deliveryCharge:FEE,total:t.tot,status:"Placed",createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(ref){
-    var ids=rJ("gg_oids",[]);ids.unshift(ref.id);localStorage.setItem("gg_oids",JSON.stringify(ids.slice(0,15)));
-    cart={};localStorage.setItem("gg_cart","{}");renderAll();closeCart();goTab("orders");
-  }).catch(function(e){alert(e.message);btn.disabled=false;renderCart()});
-}
-function trackPhone(){
-  var p=document.getElementById("tPhone").value.trim();
-  if(p){prof=Object.assign({},prof||{},{phone:p});localStorage.setItem("gg_prof",JSON.stringify(prof))}
-  renderOrders();
-}
-function renderOrders(){
-  var pq=(document.getElementById("tPhone").value||"").replace(/\D/g,"").slice(-10),ids=rJ("gg_oids",[]);
-  var list=orders.filter(function(o){var op=(o.phone||"").replace(/\D/g,"").slice(-10);return(pq&&op===pq)||ids.indexOf(o.id)!==-1});
-  var box=document.getElementById("oList");
-  if(!list.length){box.innerHTML="<p style='text-align:center;color:#64748B;padding:30px'>No orders yet.</p>";return}
-  box.innerHTML=list.map(function(o){
-    var sub=0,rows=(o.items||[]).map(function(i){var amt=Number(i.price)*Number(i.qty);sub+=amt;return"<div class='irow'><span>"+i.qty+"x "+i.name+" (₹"+i.price+")</span><b>₹"+amt+"</b></div>"}).join("");
-    var iSub=o.itemTotal||sub,del=(typeof o.deliveryCharge==="number")?o.deliveryCharge:(Number(o.total)-iSub>0?Number(o.total)-iSub:0);
-    return"<div class='box'><div style='display:flex;justify-content:space-between;margin-bottom:6px'><b>#"+o.id.slice(0,6).toUpperCase()+"</b><span class='pill'>"+(o.status||"Placed")+"</span></div><div class='ibox2'>"+rows+"<div class='irow' style='border-top:1px dashed #CBD5E1;margin-top:4px;padding-top:4px'><span>Delivery Charge</span><span>₹"+del+"</span></div><div class='irow' style='font-weight:900;color:#16A34A'><span>Grand Total (COD)</span><span>₹"+o.total+"</span></div></div><div style='font-size:12px;color:#64748B'>📍 "+(o.address||"")+"</div></div>";
-  }).join("");
-}
-initUI();
-</script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script>
-try{
-  firebase.initializeApp({projectId:"go-groc-f488d"});db=firebase.firestore();
-  db.collection("settings").doc("store").onSnapshot(function(s){
+    customerName:prof.name,phone:prof.phone,address:prof.house+", "+(prof.land||"")+", "+(prof.area||""),
+    items:list,itemTotal:t
