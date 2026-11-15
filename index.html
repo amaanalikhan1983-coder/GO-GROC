@@ -65,12 +65,30 @@
 <div id="v-home" class="view active">
   <div id="dWrap" style="display:none"><div class="head"><b>🔥 Today's Deals</b></div><div id="dRow" class="strip"></div></div>
   <div class="head"><b>Shop by Category</b><span style="font-size:12px;font-weight:700;color:#16A34A;cursor:pointer" onclick="goTab('cat')">See all →</span></div>
-  <div id="catStrip" class="strip"></div>
+  <div id="catStrip" class="strip">
+    <div class="chip" data-c="Vegetables & Fruits" onclick="setCat('Vegetables & Fruits')"><div class="cicon">🥦</div><div class="clbl">Vegetables & Fruits</div></div>
+    <div class="chip" data-c="Dairy & Bread" onclick="setCat('Dairy & Bread')"><div class="cicon">🥛</div><div class="clbl">Dairy & Bread</div></div>
+    <div class="chip" data-c="Atta, Rice & Dal" onclick="setCat('Atta, Rice & Dal')"><div class="cicon">🌾</div><div class="clbl">Atta, Rice & Dal</div></div>
+    <div class="chip" data-c="Snacks & Drinks" onclick="setCat('Snacks & Drinks')"><div class="cicon">🍟</div><div class="clbl">Snacks & Drinks</div></div>
+    <div class="chip" data-c="Fast Food" onclick="setCat('Fast Food')"><div class="cicon">🍔</div><div class="clbl">Fast Food</div></div>
+    <div class="chip" data-c="Daily Essentials" onclick="setCat('Daily Essentials')"><div class="cicon">🧴</div><div class="clbl">Daily Essentials</div></div>
+  </div>
   <div class="head"><b id="gTitle">All Fresh Items</b><span id="allBtn" style="display:none;font-size:12px;font-weight:700;color:#16A34A;cursor:pointer" onclick="setCat('All')">Show All</span></div>
-  <div id="iGrid" class="grid"><p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px">Connecting to store...</p></div>
+  <div id="iGrid" class="grid"><p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px">Loading fresh items...</p></div>
 </div>
 
-<div id="v-cat" class="view"><div class="head"><b>All Categories</b></div><div id="cGrid" class="grid"></div></div>
+<div id="v-cat" class="view">
+  <div class="head"><b>All Categories</b></div>
+  <div class="grid">
+    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Vegetables & Fruits');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🥦</div><b>Vegetables & Fruits</b></div>
+    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Dairy & Bread');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🥛</div><b>Dairy & Bread</b></div>
+    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Atta, Rice & Dal');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🌾</div><b>Atta, Rice & Dal</b></div>
+    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Snacks & Drinks');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🍟</div><b>Snacks & Drinks</b></div>
+    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Fast Food');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🍔</div><b>Fast Food</b></div>
+    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Daily Essentials');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🧴</div><b>Daily Essentials</b></div>
+  </div>
+</div>
+
 <div id="v-wish" class="view"><div class="head"><b>🔖 Saved Wishlist</b></div><div id="wGrid" class="grid"></div></div>
 
 <div id="v-orders" class="view">
@@ -120,22 +138,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-var FEE=30,CATS=[{n:"Vegetables & Fruits",i:"🥦"},{n:"Dairy & Bread",i:"🥛"},{n:"Atta, Rice & Dal",i:"🌾"},{n:"Snacks & Drinks",i:"🍟"},{n:"Fast Food",i:"🍔"},{n:"Daily Essentials",i:"🧴"}];
+var FEE=30;
 function rJ(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 var db=null,items=[],orders=[],loaded=false,isOpen=true,curCat="All",cart=rJ("gg_cart",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
 
-function initUI(){
-  var s=document.getElementById("catStrip"),g=document.getElementById("cGrid");
-  CATS.forEach(function(c){
-    var d1=document.createElement("div");d1.className="chip";d1.setAttribute("data-c",c.n);
-    d1.innerHTML="<div class='cicon'>"+c.i+"</div><div class='clbl'>"+c.n+"</div>";
-    d1.onclick=function(){setCat(c.n)};s.appendChild(d1);
-    var d2=document.createElement("div");d2.className="card";d2.style.cssText="padding:16px;text-align:center;cursor:pointer";
-    d2.innerHTML="<div style='font-size:34px;margin-bottom:6px'>"+c.i+"</div><b>"+c.n+"</b>";
-    d2.onclick=function(){setCat(c.n);goTab("home")};g.appendChild(d2);
-  });
-  syncProf();
-}
 function syncProf(){
   if(!prof||!prof.house)return;
   var lm=prof.land||prof.landmark||"";
@@ -148,6 +154,8 @@ function syncProf(){
   document.getElementById("aPhone").value=prof.phone||"";
   document.getElementById("tPhone").value=prof.phone||"";
 }
+syncProf();
+
 function goTab(t){
   ["home","cat","wish","orders"].forEach(function(x){
     document.getElementById("v-"+x).className=(x===t)?"view active":"view";
@@ -256,10 +264,8 @@ function renderCart(){
   document.getElementById("bTot").textContent="₹"+t.tot;
   var btn=document.getElementById("oBtn");
   if(t.sub<99){btn.disabled=true;btn.textContent="Add ₹"+(99-t.sub)+" more (Min ₹99)"}
-  else if(!prof||!prof.house){btn.disabled=false;btn.textContent="Add Address to Order"}
-  else{btn.disabled=false;btn.textContent="Place COD Order • ₹"+t.tot}
-}
-function openAddr(){document.getElementById("addrModal").style.display="flex"}
+  else if(!prof||!prof.house){btn.disabled=false;btn.textContent
+                              function openAddr(){document.getElementById("addrModal").style.display="flex"}
 function closeAddr(){document.getElementById("addrModal").style.display="none"}
 function saveAddr(){
   var h=document.getElementById("aHouse").value.trim(),l=document.getElementById("aLand").value.trim(),a=document.getElementById("aArea").value.trim(),n=document.getElementById("aName").value.trim(),p=document.getElementById("aPhone").value.trim();
@@ -273,4 +279,46 @@ function placeOrder(){
   var list=[];for(var id in cart){var it=items.find(function(x){return x.id===id});if(it)list.push({name:it.name,qty:cart[id],price:Number(it.price)})}
   db.collection("orders").add({
     customerName:prof.name,phone:prof.phone,address:prof.house+", "+(prof.land||"")+", "+(prof.area||""),
-    items:list,itemTotal:t
+    items:list,itemTotal:t.sub,deliveryCharge:FEE,total:t.tot,status:"Placed",createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(ref){
+    var ids=rJ("gg_oids",[]);ids.unshift(ref.id);localStorage.setItem("gg_oids",JSON.stringify(ids.slice(0,15)));
+    cart={};localStorage.setItem("gg_cart","{}");renderAll();closeCart();goTab("orders");
+  }).catch(function(e){alert(e.message);btn.disabled=false;renderCart()});
+}
+function trackPhone(){
+  var p=document.getElementById("tPhone").value.trim();
+  if(p){prof=Object.assign({},prof||{},{phone:p});localStorage.setItem("gg_prof",JSON.stringify(prof))}
+  renderOrders();
+}
+function renderOrders(){
+  var pq=(document.getElementById("tPhone").value||"").replace(/\D/g,"").slice(-10),ids=rJ("gg_oids",[]);
+  var list=orders.filter(function(o){var op=(o.phone||"").replace(/\D/g,"").slice(-10);return(pq&&op===pq)||ids.indexOf(o.id)!==-1});
+  var box=document.getElementById("oList");
+  if(!list.length){box.innerHTML="<p style='text-align:center;color:#64748B;padding:30px'>No orders yet.</p>";return}
+  box.innerHTML=list.map(function(o){
+    var sub=0,rows=(o.items||[]).map(function(i){var amt=Number(i.price)*Number(i.qty);sub+=amt;return"<div class='irow'><span>"+i.qty+"x "+i.name+" (₹"+i.price+")</span><b>₹"+amt+"</b></div>"}).join("");
+    var iSub=o.itemTotal||sub,del=(typeof o.deliveryCharge==="number")?o.deliveryCharge:(Number(o.total)-iSub>0?Number(o.total)-iSub:0);
+    return"<div class='box'><div style='display:flex;justify-content:space-between;margin-bottom:6px'><b>#"+o.id.slice(0,6).toUpperCase()+"</b><span class='pill'>"+(o.status||"Placed")+"</span></div><div class='ibox2'>"+rows+"<div class='irow' style='border-top:1px dashed #CBD5E1;margin-top:4px;padding-top:4px'><span>Delivery Charge</span><span>₹"+del+"</span></div><div class='irow' style='font-weight:900;color:#16A34A'><span>Grand Total (COD)</span><span>₹"+o.total+"</span></div></div><div style='font-size:12px;color:#64748B'>📍 "+(o.address||"")+"</div></div>";
+  }).join("");
+}
+try{
+  firebase.initializeApp({projectId:"go-groc-f488d"});
+  db=firebase.firestore();
+  db.collection("settings").doc("store").onSnapshot(function(s){
+    if(s.exists){isOpen=s.data().isOpen!==false;var el=document.getElementById("stPill");el.textContent=isOpen?"● OPEN":"● CLOSED";el.className=isOpen?"pill":"pill closed"}
+  });
+  db.collection("menu").onSnapshot(function(s){
+    items=s.docs.map(function(d){return Object.assign({id:d.id},d.data())});
+    loaded=true;renderAll();
+  });
+  db.collection("orders").onSnapshot(function(s){
+    orders=s.docs.map(function(d){return Object.assign({id:d.id},d.data())});
+    orders.sort(function(a,b){return((b.createdAt&&b.createdAt.seconds)||0)-((a.createdAt&&a.createdAt.seconds)||0)});
+    renderOrders();
+  });
+}catch(e){
+  document.getElementById("iGrid").innerHTML="<p style='grid-column:span 2;text-align:center;color:red;padding:30px'>"+e.message+"</p>";
+}
+</script>
+</body>
+</html>
