@@ -53,6 +53,11 @@
   .bmain:disabled{background:#94A3B8}
   .ibox2{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px;margin:8px 0;font-size:13px}
   .irow{display:flex;justify-content:space-between;padding:3px 0}
+  .trk{display:flex;justify-content:space-between;margin:12px 0;position:relative}
+  .trk::before{content:"";position:absolute;top:9px;left:10%;right:10%;height:3px;background:#E2E8F0;z-index:1}
+  .stp{position:relative;z-index:2;text-align:center;width:25%;font-size:10px;color:#94A3B8;font-weight:700}
+  .sdot{width:20px;height:20px;border-radius:50%;background:#E2E8F0;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px}
+  .stp.on{color:#16A34A}.stp.on .sdot{background:#16A34A}
 </style>
 </head>
 <body>
@@ -298,9 +303,14 @@ function renderOrders(){
   var box=document.getElementById("oList");
   if(!list.length){box.innerHTML="<p style='text-align:center;color:#64748B;padding:30px'>No orders yet.</p>";return}
   box.innerHTML=list.map(function(o){
+    var st=(o.status||"Placed").toLowerCase();
+    var s2=st.indexOf("prepar")!==-1||st.indexOf("out")!==-1||st.indexOf("deliver")!==-1||st.indexOf("complet")!==-1;
+    var s3=st.indexOf("out")!==-1||st.indexOf("deliver")!==-1||st.indexOf("complet")!==-1;
+    var s4=st.indexOf("deliver")!==-1||st.indexOf("complet")!==-1;
+    var trk="<div class='trk'><div class='stp on'><div class='sdot'>✓</div>Placed</div><div class='stp "+(s2?"on":"")+"'><div class='sdot'>"+(s2?"✓":"2")+"</div>Preparing</div><div class='stp "+(s3?"on":"")+"'><div class='sdot'>"+(s3?"✓":"3")+"</div>Out for Delivery</div><div class='stp "+(s4?"on":"")+"'><div class='sdot'>"+(s4?"✓":"4")+"</div>Delivered</div></div>";
     var sub=0,rows=(o.items||[]).map(function(i){var amt=Number(i.price)*Number(i.qty);sub+=amt;return"<div class='irow'><span>"+i.qty+"x "+i.name+" (₹"+i.price+")</span><b>₹"+amt+"</b></div>"}).join("");
     var iSub=o.itemTotal||sub,del=(typeof o.deliveryCharge==="number")?o.deliveryCharge:(Number(o.total)-iSub>0?Number(o.total)-iSub:0);
-    return"<div class='box'><div style='display:flex;justify-content:space-between;margin-bottom:6px'><b>#"+o.id.slice(0,6).toUpperCase()+"</b><span class='pill'>"+(o.status||"Placed")+"</span></div><div class='ibox2'>"+rows+"<div class='irow' style='border-top:1px dashed #CBD5E1;margin-top:4px;padding-top:4px'><span>Delivery Charge</span><span>₹"+del+"</span></div><div class='irow' style='font-weight:900;color:#16A34A'><span>Grand Total (COD)</span><span>₹"+o.total+"</span></div></div><div style='font-size:12px;color:#64748B'>📍 "+(o.address||"")+"</div></div>";
+    return"<div class='box'><div style='display:flex;justify-content:space-between;margin-bottom:4px'><b>#"+o.id.slice(0,6).toUpperCase()+"</b><span class='pill'>"+(o.status||"Placed")+"</span></div>"+trk+"<div class='ibox2'>"+rows+"<div class='irow' style='border-top:1px dashed #CBD5E1;margin-top:4px;padding-top:4px'><span>Delivery Charge</span><span>₹"+del+"</span></div><div class='irow' style='font-weight:900;color:#16A34A'><span>Grand Total (COD)</span><span>₹"+o.total+"</span></div></div><div style='font-size:12px;color:#64748B'>📍 "+(o.address||"")+"</div></div>";
   }).join("");
 }
 
