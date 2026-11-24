@@ -27,14 +27,17 @@
   .input-box { width: 100%; background: #262626; border: 1px solid #333; color: #fff; padding: 11px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
   .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .btn-primary { width: 100%; background: #2ECC71; color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 15px; cursor: pointer; }
-  .btn-import { width: 100%; background: #1E3A8A; color: #93C5FD; border: 1px dashed #3B82F6; padding: 11px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; margin-bottom: 14px; }
   .menu-row { display: flex; align-items: center; justify-content: space-between; background: #1E1E1E; border: 1px solid #2C2C2C; padding: 10px; border-radius: 10px; margin-bottom: 10px; gap: 8px; }
   .menu-thumb { width: 48px; height: 48px; border-radius: 8px; background: #262626; display: flex; align-items: center; justify-content: center; font-size: 26px; overflow: hidden; flex-shrink: 0; margin-right: 10px; }
   .menu-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .toggle-btn { padding: 6px 9px; border-radius: 8px; border: none; font-weight: 700; font-size: 11px; cursor: pointer; }
   .inv-line { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
-  .alert-banner { display: none; background: #DC2626; color: #fff; text-align: center; padding: 10px; font-weight: 800; font-size: 14px; animation: pulse 0.8s infinite alternate; }
-  @keyframes pulse { from { opacity: 1; } to { opacity: 0.7; } }
+  .alert-banner { display: none; background: #DC2626; color: #fff; text-align: center; padding: 10px; font-weight: 800; font-size: 14px; }
+  .var-box { background: #161616; border: 1px dashed #3A3A3A; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
+  .var-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+  .var-row input { margin-bottom: 0; padding: 8px; font-size: 13px; }
+  .var-quick { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .q-chip { background: #262626; color: #93C5FD; border: 1px solid #3B82F6; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body onclick="unlockAudio()">
@@ -62,12 +65,10 @@
 </div>
 
 <div id="menuSection" class="section">
-  <button id="importBtn" class="btn-import" onclick="importStarterItems()">⚡ Import All 20 Starter Items to Edit Here</button>
-
   <div class="card">
     <h3 id="formTitle" style="margin-bottom:10px;font-size:16px;">Add New Item</h3>
     <input type="hidden" id="editItemId" value="">
-    <input type="text" id="itemName" class="input-box" placeholder="Item Name (e.g., Fresh Onions 1kg)">
+    <input type="text" id="itemName" class="input-box" placeholder="Item Name (e.g., Cold Coffee / Cheese Burger)">
     <select id="itemCategory" class="input-box">
       <option value="Vegetables & Fruits">Vegetables & Fruits</option>
       <option value="Dairy & Bread">Dairy & Bread</option>
@@ -77,10 +78,21 @@
       <option value="Daily Essentials">Daily Essentials</option>
     </select>
     <div class="row-2">
-      <input type="number" id="itemMrp" class="input-box" placeholder="MRP ₹ (Optional, e.g. 60)">
-      <input type="number" id="itemPrice" class="input-box" placeholder="Selling Price ₹ * (e.g. 40)">
+      <input type="number" id="itemMrp" class="input-box" placeholder="Base MRP ₹ (Optional)">
+      <input type="number" id="itemPrice" class="input-box" placeholder="Base Price ₹ *">
     </div>
     <input type="text" id="itemDesc" class="input-box" placeholder="Short Description">
+
+    <!-- Size / Custom Options Builder -->
+    <div class="var-box">
+      <div style="font-size:12px;font-weight:800;color:#2ECC71;margin-bottom:6px;">Sizes / Custom Options (Optional)</div>
+      <div class="var-quick">
+        <span class="q-chip" onclick="addSML()">+ Small / Medium / Large</span>
+        <span class="q-chip" onclick="addVariantRow('', '')">+ Custom Option (e.g. With Cheese)</span>
+      </div>
+      <div id="variantsContainer"></div>
+    </div>
+
     <input type="file" id="itemPhoto" accept="image/*" class="input-box" onchange="compressImage(event)">
     <img id="previewImg" style="width:70px;height:70px;object-fit:cover;border-radius:8px;display:none;margin-bottom:10px;">
     <button id="addItemBtn" class="btn-primary" onclick="saveMenuItem()">Add Item to Menu</button>
@@ -102,7 +114,6 @@
   var currentEmoji = "";
   var allMenuDocs = [];
 
-  // --- LOUD ORDER BUZZER / RINGTONE SYSTEM ---
   var soundEnabled = true;
   var audioCtx = null;
   var initialOrdersLoaded = false;
@@ -113,20 +124,14 @@
       var AC = window.AudioContext || window.webkitAudioContext;
       if (AC) audioCtx = new AC();
     }
-    if (audioCtx && audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
+    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
   }
 
   function playLoudOrderBuzzer() {
     if (!soundEnabled) return;
     unlockAudio();
     if (!audioCtx) return;
-
-    if (navigator.vibrate) {
-      navigator.vibrate([400, 150, 400, 150, 600]);
-    }
-
+    if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 600]);
     var now = audioCtx.currentTime;
     var freqs = [880, 1174.66, 880, 1174.66, 987.77, 1318.51];
     for (var i = 0; i < freqs.length; i++) {
@@ -134,15 +139,11 @@
       var gain = audioCtx.createGain();
       osc.type = "sawtooth";
       osc.frequency.setValueAtTime(freqs[i], now + i * 0.22);
-
       gain.gain.setValueAtTime(0.001, now + i * 0.22);
       gain.gain.exponentialRampToValueAtTime(0.9, now + i * 0.22 + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.22 + 0.20);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now + i * 0.22);
-      osc.stop(now + i * 0.22 + 0.21);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(now + i * 0.22); osc.stop(now + i * 0.22 + 0.21);
     }
   }
 
@@ -156,28 +157,36 @@
     if (soundEnabled) playLoudOrderBuzzer();
   }
 
-  var STARTER_ITEMS = [
-    { name: "Fresh Aloo (Potato) 1 kg", category: "Vegetables & Fruits", mrp: 40, price: 28, emoji: "🥔", desc: "Farm fresh sorted potatoes" },
-    { name: "Red Onion (Pyaz) 1 kg", category: "Vegetables & Fruits", mrp: 45, price: 32, emoji: "🧅", desc: "Fresh Nashik red onions" },
-    { name: "Desi Tomato 500 g", category: "Vegetables & Fruits", mrp: 30, price: 20, emoji: "🍅", desc: "Juicy red tomatoes" },
-    { name: "Fresh Banana (6 pcs)", category: "Vegetables & Fruits", mrp: 45, price: 35, emoji: "🍌", desc: "Ripe sweet bananas" },
-    { name: "Saras Gold Full Cream Milk 1L", category: "Dairy & Bread", mrp: 68, price: 66, emoji: "🥛", desc: "Fresh pasteurized milk" },
-    { name: "Fresh Dahi (Curd) 400 g", category: "Dairy & Bread", mrp: 40, price: 35, emoji: "🥣", desc: "Thick & creamy curd" },
-    { name: "White Sandwich Bread", category: "Dairy & Bread", mrp: 45, price: 40, emoji: "🍞", desc: "Soft freshly baked bread" },
-    { name: "Amul Pasteurised Butter 100g", category: "Dairy & Bread", mrp: 60, price: 56, emoji: "🧈", desc: "Utterly butterly delicious" },
-    { name: "Aashirvaad Shudh Chakki Atta 5kg", category: "Atta, Rice & Dal", mrp: 265, price: 235, emoji: "🌾", desc: "100% whole wheat flour" },
-    { name: "Basmati Rice 1 kg", category: "Atta, Rice & Dal", mrp: 110, price: 89, emoji: "🍚", desc: "Long grain aromatic rice" },
-    { name: "Toor / Arhar Dal 1 kg", category: "Atta, Rice & Dal", mrp: 175, price: 155, emoji: "🫘", desc: "Unpolished protein-rich dal" },
-    { name: "Fortune Refined Soyabean Oil 1L", category: "Atta, Rice & Dal", mrp: 145, price: 129, emoji: "🫗", desc: "Light & healthy cooking oil" },
-    { name: "Lay's Classic Salted Chips", category: "Snacks & Drinks", mrp: 20, price: 20, emoji: "🍟", desc: "Crispy potato chips pack" },
-    { name: "Coca-Cola Cold Drink 750 ml", category: "Snacks & Drinks", mrp: 45, price: 40, emoji: "🥤", desc: "Chilled refreshing drink" },
-    { name: "Parle-G Gold Biscuits Pack", category: "Snacks & Drinks", mrp: 30, price: 28, emoji: "🍪", desc: "Crunchy tea-time biscuits" },
-    { name: "Aloo Tikki Burger", category: "Fast Food", mrp: 60, price: 40, emoji: "🍔", desc: "Crispy aloo patty, onion, tomato & creamy mayo" },
-    { name: "Veg Cheese Grilled Sandwich", category: "Fast Food", mrp: 80, price: 60, emoji: "🥪", desc: "Loaded veggies with melted cheese" },
-    { name: "Cold Coffee (300 ml)", category: "Fast Food", mrp: 70, price: 55, emoji: "🧋", desc: "Thick creamy chilled coffee" },
-    { name: "Tata Iodized Salt 1 kg", category: "Daily Essentials", mrp: 28, price: 26, emoji: "🧂", desc: "Desh ka namak" },
-    { name: "Surf Excel Detergent Bar (Pack of 3)", category: "Daily Essentials", mrp: 90, price: 78, emoji: "🧼", desc: "Tough stain removal" }
-  ];
+  function addVariantRow(label, price, mrp) {
+    var box = document.getElementById("variantsContainer");
+    var row = document.createElement("div");
+    row.className = "var-row";
+    row.innerHTML =
+      '<input type="text" class="input-box v-lbl" placeholder="Option (e.g. Large / With Cheese)" value="' + (label || "") + '" style="flex:2">' +
+      '<input type="number" class="input-box v-prc" placeholder="Price ₹" value="' + (price || "") + '" style="flex:1">' +
+      '<input type="number" class="input-box v-mrp" placeholder="MRP" value="' + (mrp || "") + '" style="flex:1">' +
+      '<button type="button" onclick="this.parentElement.remove()" style="background:#3A1E1E;color:#E74C3C;border:none;padding:8px 10px;border-radius:8px;font-weight:800;cursor:pointer;">✕</button>';
+    box.appendChild(row);
+  }
+
+  function addSML() {
+    var base = Number(document.getElementById("itemPrice").value) || "";
+    addVariantRow("Small", base, "");
+    addVariantRow("Medium", base ? base + 20 : "", "");
+    addVariantRow("Large", base ? base + 40 : "", "");
+  }
+
+  function getVariantsFromForm() {
+    var rows = document.querySelectorAll("#variantsContainer .var-row");
+    var list = [];
+    rows.forEach(function(r) {
+      var lbl = r.querySelector(".v-lbl").value.trim();
+      var prc = Number(r.querySelector(".v-prc").value);
+      var mrp = Number(r.querySelector(".v-mrp").value) || 0;
+      if (lbl && prc > 0) list.push({ label: lbl, price: prc, mrp: mrp });
+    });
+    return list;
+  }
 
   function switchTab(t) {
     document.getElementById("tabOrders").className = t === "orders" ? "tab active" : "tab";
@@ -194,9 +203,7 @@
     btn.style.color = storeOpen ? "#000" : "#fff";
   });
 
-  function toggleStore() {
-    db.collection("settings").doc("store").set({ isOpen: !storeOpen }, { merge: true });
-  }
+  function toggleStore() { db.collection("settings").doc("store").set({ isOpen: !storeOpen }, { merge: true }); }
 
   db.collection("orders").orderBy("createdAt", "desc").onSnapshot(function(snap) {
     var hasNewOrder = false;
@@ -207,18 +214,13 @@
       }
     });
     initialOrdersLoaded = true;
-
     if (hasNewOrder) {
       playLoudOrderBuzzer();
       document.getElementById("newOrderBanner").style.display = "block";
       switchTab("orders");
     }
-
     var container = document.getElementById("ordersList");
-    if (snap.empty) {
-      container.innerHTML = '<p style="text-align:center;color:#777;padding:30px;">No orders yet.</p>';
-      return;
-    }
+    if (snap.empty) { container.innerHTML = '<p style="text-align:center;color:#777;padding:30px;">No orders yet.</p>'; return; }
     container.innerHTML = snap.docs.map(function(d) {
       var o = d.data();
       var itemsHtml = (o.items || []).map(function(i) {
@@ -227,12 +229,10 @@
       var delFee = (typeof o.deliveryCharge === "number") ? o.deliveryCharge : 0;
       var delHtml = delFee > 0 ? '<div class="inv-line" style="color:#aaa;border-top:1px dashed #333;margin-top:4px;padding-top:4px;"><span>Delivery Charge</span><span>₹' + delFee + '</span></div>' : '';
       var statuses = ["Placed", "Preparing", "Out for Delivery", "Completed"];
-      var doorPhotoHtml = o.doorPhoto ? '<img src="' + o.doorPhoto + '" style="width:100%;max-height:150px;object-fit:cover;border-radius:8px;margin-bottom:10px;border:1px solid #333;">' : "";
       return '<div class="card">' +
         '<div class="order-top"><b>#' + d.id.slice(0,6).toUpperCase() + '</b><span class="badge">' + (o.status || "Placed") + '</span></div>' +
         '<div style="font-size:14px;margin-bottom:4px;"><b>' + o.customerName + '</b> (' + o.phone + ')</div>' +
         '<div style="font-size:12px;color:#aaa;margin-bottom:10px;">📍 ' + o.address + '</div>' +
-        doorPhotoHtml +
         '<div style="background:#161616;padding:10px;border-radius:8px;margin-bottom:8px;">' + itemsHtml + delHtml + '</div>' +
         '<div style="font-size:16px;font-weight:800;color:#2ECC71;text-align:right;">Grand Total: ₹' + o.total + '</div>' +
         '<div class="status-btns">' + statuses.map(function(s) { return '<button class="st-btn ' + (o.status === s ? 'active' : '') + '" onclick="setOrderStatus(\'' + d.id + '\',\'' + s + '\')">' + s + '</button>'; }).join("") + '</div>' +
@@ -243,23 +243,6 @@
 
   function setOrderStatus(id, status) { db.collection("orders").doc(id).update({ status: status }); }
   function removeOrder(id) { if (confirm("Delete this order permanently?")) db.collection("orders").doc(id).delete(); }
-
-  function importStarterItems() {
-    var btn = document.getElementById("importBtn");
-    btn.disabled = true; btn.textContent = "Importing 20 items...";
-    var batch = db.batch();
-    STARTER_ITEMS.forEach(function(item) {
-      var ref = db.collection("menu").doc();
-      batch.set(ref, Object.assign({}, item, { image: "", inStock: true }));
-    });
-    batch.commit().then(function() {
-      btn.textContent = "✓ All 20 Items Imported!";
-      setTimeout(function() { btn.disabled = false; btn.textContent = "⚡ Import All 20 Starter Items to Edit Here"; }, 2500);
-    }).catch(function(e) {
-      alert("Error: " + e.message);
-      btn.disabled = false; btn.textContent = "⚡ Import All 20 Starter Items to Edit Here";
-    });
-  }
 
   function compressImage(event) {
     var file = event.target.files[0];
@@ -291,6 +274,8 @@
     document.getElementById("itemMrp").value = m.mrp || "";
     document.getElementById("itemPrice").value = m.price || "";
     document.getElementById("itemDesc").value = m.desc || "";
+    document.getElementById("variantsContainer").innerHTML = "";
+    (m.variants || []).forEach(function(v) { addVariantRow(v.label, v.price, v.mrp); });
     compressedBase64 = m.image || "";
     currentEmoji = m.emoji || "🛒";
     var prev = document.getElementById("previewImg");
@@ -308,12 +293,12 @@
     document.getElementById("itemMrp").value = "";
     document.getElementById("itemPrice").value = "";
     document.getElementById("itemDesc").value = "";
+    document.getElementById("variantsContainer").innerHTML = "";
     document.getElementById("itemPhoto").value = "";
     document.getElementById("previewImg").style.display = "none";
     document.getElementById("addItemBtn").textContent = "Add Item to Menu";
     document.getElementById("cancelEditBtn").style.display = "none";
-    compressedBase64 = "";
-    currentEmoji = "";
+    compressedBase64 = ""; currentEmoji = "";
   }
 
   function saveMenuItem() {
@@ -323,23 +308,20 @@
     var mrp = Number(document.getElementById("itemMrp").value) || 0;
     var price = Number(document.getElementById("itemPrice").value);
     var desc = document.getElementById("itemDesc").value.trim();
-    if (!name || !price) { alert("Please enter item name and selling price!"); return; }
+    var variants = getVariantsFromForm();
+    if (!name || (!price && !variants.length)) { alert("Please enter item name and price!"); return; }
+    if (!price && variants.length) price = variants[0].price;
 
     var btn = document.getElementById("addItemBtn");
     btn.disabled = true; btn.textContent = "Saving...";
-    var data = { name: name, category: category, mrp: mrp, price: price, desc: desc, image: compressedBase64, emoji: currentEmoji || "🛒" };
+    var data = { name: name, category: category, mrp: mrp, price: price, desc: desc, variants: variants, image: compressedBase64, emoji: currentEmoji || "🛒" };
 
     var op = editId
       ? db.collection("menu").doc(editId).update(data)
       : db.collection("menu").add(Object.assign(data, { inStock: true }));
 
-    op.then(function() {
-      resetForm();
-      btn.disabled = false;
-    }).catch(function(e) {
-      alert("Error: " + e.message);
-      btn.disabled = false; btn.textContent = editId ? "Save Changes" : "Add Item to Menu";
-    });
+    op.then(function() { resetForm(); btn.disabled = false; })
+      .catch(function(e) { alert("Error: " + e.message); btn.disabled = false; btn.textContent = editId ? "Save Changes" : "Add Item to Menu"; });
   }
 
   db.collection("menu").onSnapshot(function(snap) {
@@ -347,15 +329,15 @@
     document.getElementById("menuCount").textContent = allMenuDocs.length;
     document.getElementById("menuList").innerHTML = allMenuDocs.map(function(m) {
       var stock = m.inStock !== false;
-      var mrpTxt = m.mrp > m.price ? '<span style="text-decoration:line-through;color:#888;font-size:11px;margin-right:4px;">₹' + m.mrp + '</span>' : "";
+      var vCount = (m.variants && m.variants.length) ? ' <span style="background:#1E3A8A;color:#93C5FD;font-size:10px;padding:1px 6px;border-radius:4px;">' + m.variants.length + ' options</span>' : '';
       var thumb = m.image ? '<img src="' + m.image + '">' : (m.emoji || "🛒");
       return '<div class="menu-row">' +
         '<div style="display:flex;align-items:center;flex:1;min-width:0;">' +
           '<div class="menu-thumb">' + thumb + '</div>' +
           '<div style="min-width:0;">' +
-            '<div style="font-size:10px;color:#2ECC71;font-weight:700;">' + (m.category || "Daily Essentials") + '</div>' +
+            '<div style="font-size:10px;color:#2ECC71;font-weight:700;">' + (m.category || "Daily Essentials") + vCount + '</div>' +
             '<div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + m.name + '</div>' +
-            '<div style="color:#2ECC71;font-weight:700;font-size:13px;">' + mrpTxt + '₹' + m.price + '</div>' +
+            '<div style="color:#2ECC71;font-weight:700;font-size:13px;">₹' + m.price + '</div>' +
           '</div>' +
         '</div>' +
         '<div style="display:flex;gap:5px;flex-shrink:0;">' +
