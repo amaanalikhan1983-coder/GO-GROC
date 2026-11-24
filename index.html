@@ -35,7 +35,7 @@
   .prow{display:flex;justify-content:space-between;align-items:center}
   .mrp{font-size:11px;color:#94A3B8;text-decoration:line-through;display:block}
   .price{font-size:15px;font-weight:800}
-  .badd{background:#fff;color:#16A34A;border:1.5px solid #16A34A;padding:5px 14px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer}
+  .badd{background:#fff;color:#16A34A;border:1.5px solid #16A34A;padding:5px 12px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer}
   .qbox{display:flex;align-items:center;background:#16A34A;border-radius:8px}
   .qbox button{background:none;border:none;color:#fff;font-weight:800;padding:5px 9px;font-size:14px;cursor:pointer}
   .qbox span{color:#fff;font-weight:800;font-size:12px;padding:0 4px}
@@ -58,13 +58,18 @@
   .stp{position:relative;z-index:2;text-align:center;width:25%;font-size:10px;color:#94A3B8;font-weight:700}
   .sdot{width:20px;height:20px;border-radius:50%;background:#E2E8F0;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px}
   .stp.on{color:#16A34A}.stp.on .sdot{background:#16A34A}
-  /* Product Detail Modal */
-  .pd-hero{position:relative;width:100%;height:290px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:110px;overflow:hidden}
+  /* Product Detail & Variant Cards */
+  .pd-hero{position:relative;width:100%;height:270px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:105px;overflow:hidden}
   .pd-hero img{width:100%;height:100%;object-fit:cover}
   .pd-top-btns{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;z-index:5}
   .pd-circle{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.95);border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08)}
   .pd-meta{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700}
   .pd-off{background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;margin-left:6px}
+  .var-scroll{display:flex;gap:10px;overflow-x:auto;padding:6px 0}
+  .v-card{min-width:115px;border:1.5px solid #E2E8F0;background:#fff;border-radius:12px;padding:10px;cursor:pointer;flex-shrink:0;transition:.15s}
+  .v-card.active{border:2px solid #2563EB;background:#EFF6FF}
+  .v-card-lbl{font-size:13px;font-weight:800;color:#0F172A;margin-bottom:4px}
+  .v-card-prc{font-size:14px;font-weight:900;color:#0F172A}
   .pd-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
   .pd-bitem{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;color:#334155}
   .pd-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:12px 16px;border-top:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center;z-index:360}
@@ -144,11 +149,16 @@
   </div>
   <div class="box">
     <div id="pdCatLink" style="font-size:12px;font-weight:800;color:#16A34A;margin-bottom:6px;cursor:pointer"></div>
-    <div id="pdName" style="font-size:19px;font-weight:900;color:#0F172A;margin-bottom:8px;line-height:1.25"></div>
+    <div id="pdName" style="font-size:19px;font-weight:900;color:#0F172A;margin-bottom:6px;line-height:1.25"></div>
+    <div id="pdSelLabel" style="font-size:12px;color:#64748B;font-weight:700;margin-bottom:8px;display:none"></div>
     <div style="display:flex;align-items:baseline;gap:6px">
       <span id="pdPrice" style="font-size:20px;font-weight:900;color:#0F172A"></span>
       <span id="pdMrp" class="mrp" style="display:inline;font-size:13px"></span>
       <span id="pdOff" class="pd-off" style="display:none"></span>
+    </div>
+    <div id="pdVarWrap" style="display:none;margin-top:12px;border-top:1px solid #F1F5F9;padding-top:10px">
+      <div style="font-size:12px;font-weight:800;color:#334155;margin-bottom:6px">Select Option / Size:</div>
+      <div id="pdVarRow" class="var-scroll"></div>
     </div>
   </div>
   <div class="box">
@@ -164,7 +174,7 @@
   </div>
   <div class="pd-footer">
     <div>
-      <div style="font-size:11px;color:#64748B;font-weight:700">Item Price</div>
+      <div id="pdFootSub" style="font-size:11px;color:#64748B;font-weight:700">Item Price</div>
       <div style="display:flex;align-items:baseline;gap:6px">
         <span id="pdFootPrice" style="font-size:18px;font-weight:900"></span>
         <span id="pdFootMrp" class="mrp" style="display:inline;font-size:12px"></span>
@@ -203,7 +213,7 @@
 <script>
 var FEE=30;
 function rJ(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
-var db=null,items=[],orders=[],loaded=false,isOpen=true,curCat="All",detailId=null,cart=rJ("gg_cart",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
+var db=null,items=[],orders=[],loaded=false,isOpen=true,curCat="All",detailId=null,selVarIdx=0,cart=rJ("gg_cart_v2",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
 
 function syncProf(){
   if(!prof||!prof.house)return;
@@ -234,10 +244,26 @@ function setCat(c){
   renderItems();
 }
 
-function openDetail(id){
+function getItemTotalQty(id){
+  var sum=0;
+  for(var k in cart){if(k===id||k.indexOf(id+"::")===0)sum+=cart[k]}
+  return sum;
+}
+function resolveCartEntry(key){
+  var parts=key.split("::");
+  var it=items.find(function(x){return x.id===parts[0]});
+  if(!it)return null;
+  if(parts.length===1)return{key:key,name:it.name,price:Number(it.price),qty:cart[key]};
+  var v=(it.variants||[]).find(function(x){return x.label===parts[1]});
+  var prc=v?Number(v.price):Number(it.price);
+  return{key:key,name:it.name+" ("+parts[1]+")",price:prc,qty:cart[key]};
+}
+
+function openDetail(id,vIdx){
   var it=items.find(function(x){return x.id===id});
   if(!it)return;
   detailId=id;
+  selVarIdx=vIdx||0;
   var med=document.getElementById("pdMedia");
   med.innerHTML=(it.image&&it.image.length>10)?"<img src='"+it.image+"'>":(it.emoji||"🛒");
   var cat=it.category||"Daily Essentials";
@@ -245,16 +271,6 @@ function openDetail(id){
   cl.textContent="Explore all "+cat+" >";
   cl.onclick=function(){closeDetail();setCat(cat);goTab("home")};
   document.getElementById("pdName").textContent=it.name;
-  document.getElementById("pdPrice").textContent="₹"+it.price;
-  document.getElementById("pdFootPrice").textContent="₹"+it.price;
-  var hasMrp=it.mrp&&Number(it.mrp)>Number(it.price);
-  document.getElementById("pdMrp").textContent=hasMrp?"₹"+it.mrp:"";
-  document.getElementById("pdFootMrp").textContent=hasMrp?"₹"+it.mrp:"";
-  var offEl=document.getElementById("pdOff");
-  if(hasMrp){
-    offEl.style.display="inline-block";
-    offEl.textContent=Math.round(((it.mrp-it.price)/it.mrp)*100)+"% OFF";
-  }else{offEl.style.display="none"}
   document.getElementById("pdDesc").textContent=it.desc||"Freshly prepared and delivered fast to your doorstep in Makrana.";
   renderDetailControls();
   document.getElementById("pdModal").style.display="flex";
@@ -274,53 +290,107 @@ function shareDetail(){
   if(navigator.share)navigator.share({title:it.name,text:txt,url:location.href}).catch(function(){});
   else alert(txt);
 }
+
 function renderDetailControls(){
   if(!detailId)return;
   var it=items.find(function(x){return x.id===detailId});
   if(!it)return;
   document.getElementById("pdWishBtn").textContent=wish.indexOf(detailId)!==-1?"❤️":"🔖";
+
+  var vars=it.variants||[];
+  var hasVars=vars.length>0;
+  var activeVar=hasVars?(vars[selVarIdx]||vars[0]):null;
+  var curPrice=activeVar?Number(activeVar.price):Number(it.price);
+  var curMrp=activeVar?(Number(activeVar.mrp)||0):(Number(it.mrp)||0);
+  var cartKey=activeVar?(it.id+"::"+activeVar.label):it.id;
+
+  var selLbl=document.getElementById("pdSelLabel");
+  if(activeVar){
+    selLbl.style.display="block";
+    selLbl.textContent="Selected: "+activeVar.label;
+    document.getElementById("pdFootSub").textContent=activeVar.label;
+  }else{
+    selLbl.style.display="none";
+    document.getElementById("pdFootSub").textContent="Item Price";
+  }
+
+  document.getElementById("pdPrice").textContent="₹"+curPrice;
+  document.getElementById("pdFootPrice").textContent="₹"+curPrice;
+  var hasMrp=curMrp>curPrice;
+  document.getElementById("pdMrp").textContent=hasMrp?"₹"+curMrp:"";
+  document.getElementById("pdFootMrp").textContent=hasMrp?"₹"+curMrp:"";
+  var offEl=document.getElementById("pdOff");
+  if(hasMrp){
+    offEl.style.display="inline-block";
+    offEl.textContent=Math.round(((curMrp-curPrice)/curMrp)*100)+"% OFF";
+  }else{offEl.style.display="none"}
+
+  var vWrap=document.getElementById("pdVarWrap");
+  var vRow=document.getElementById("pdVarRow");
+  if(hasVars){
+    vWrap.style.display="block";
+    vRow.innerHTML="";
+    vars.forEach(function(v,idx){
+      var vc=document.createElement("div");
+      vc.className="v-card"+(idx===selVarIdx?" active":"");
+      var vHasMrp=v.mrp&&Number(v.mrp)>Number(v.price);
+      var offTag=vHasMrp?"<div style='font-size:10px;color:#16A34A;font-weight:800'>"+Math.round(((v.mrp-v.price)/v.mrp)*100)+"% OFF</div>":"";
+      vc.innerHTML="<div class='v-card-lbl'>"+v.label+"</div>"+offTag+"<div class='v-card-prc'>₹"+v.price+(vHasMrp?" <span class='mrp' style='display:inline;font-size:11px'>₹"+v.mrp+"</span>":"")+"</div>";
+      vc.onclick=function(){selVarIdx=idx;renderDetailControls()};
+      vRow.appendChild(vc);
+    });
+  }else{vWrap.style.display="none"}
+
   var act=document.getElementById("pdAction");
   act.innerHTML="";
-  var q=cart[detailId]||0;
+  var q=cart[cartKey]||0;
   if(it.inStock===false){
     act.innerHTML="<span style='color:#DC2626;font-weight:800;font-size:13px'>Out of Stock</span>";
   }else if(q===0){
     var b=document.createElement("button");
     b.style.cssText="background:#16A34A;color:#fff;border:none;padding:11px 32px;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer";
     b.textContent="ADD";
-    b.onclick=function(){addQty(detailId,1)};
+    b.onclick=function(){addQty(cartKey,1)};
     act.appendChild(b);
   }else{
     var qb=document.createElement("div");qb.className="qbox";qb.style.padding="3px 6px";
-    var b1=document.createElement("button");b1.style.fontSize="18px";b1.textContent="−";b1.onclick=function(){addQty(detailId,-1)};
+    var b1=document.createElement("button");b1.style.fontSize="18px";b1.textContent="−";b1.onclick=function(){addQty(cartKey,-1)};
     var sp=document.createElement("span");sp.style.fontSize="15px";sp.textContent=q;
-    var b2=document.createElement("button");b2.style.fontSize="18px";b2.textContent="+";b2.onclick=function(){addQty(detailId,1)};
+    var b2=document.createElement("button");b2.style.fontSize="18px";b2.textContent="+";b2.onclick=function(){addQty(cartKey,1)};
     qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);
     act.appendChild(qb);
   }
 }
 
 function makeCard(it){
-  var q=cart[it.id]||0,ok=it.inStock!==false,w=wish.indexOf(it.id)!==-1,deal=it.mrp&&Number(it.mrp)>Number(it.price);
+  var hasVars=it.variants&&it.variants.length>0;
+  var q=hasVars?getItemTotalQty(it.id):(cart[it.id]||0);
+  var ok=it.inStock!==false,w=wish.indexOf(it.id)!==-1,deal=it.mrp&&Number(it.mrp)>Number(it.price);
   var card=document.createElement("div");card.className="card";
   var wb=document.createElement("div");wb.className="wbtn";wb.textContent=w?"❤️":"🔖";
   wb.onclick=function(e){e.stopPropagation();var idx=wish.indexOf(it.id);if(idx!==-1)wish.splice(idx,1);else wish.push(it.id);localStorage.setItem("gg_wish",JSON.stringify(wish));renderAll()};
   card.appendChild(wb);
   var ib=document.createElement("div");ib.className="ibox";
-  ib.onclick=function(){openDetail(it.id)};
+  ib.onclick=function(){openDetail(it.id,0)};
   if(it.image&&it.image.length>10){var img=document.createElement("img");img.src=it.image;ib.appendChild(img)}else{ib.textContent=it.emoji||"🛒"}
   card.appendChild(ib);
   var bd=document.createElement("div");bd.className="cbd";
   var topInfo=document.createElement("div");
-  topInfo.onclick=function(){openDetail(it.id)};
+  topInfo.onclick=function(){openDetail(it.id,0)};
   topInfo.innerHTML="<div class='ccat'>"+(it.category||"Grocery")+"</div><div class='cname'>"+it.name+"</div><div class='cdesc'>"+(it.desc||"")+"</div>";
   bd.appendChild(topInfo);
 
   var pr=document.createElement("div");pr.className="prow";
   pr.innerHTML="<div>"+(deal?"<span class='mrp'>₹"+it.mrp+"</span>":"")+"<span class='price'>₹"+it.price+"</span></div>";
   if(!ok){pr.innerHTML+="<span style='font-size:11px;color:#DC2626;font-weight:700'>Out of Stock</span>"}
-  else if(q===0){var b=document.createElement("button");b.className="badd";b.textContent="ADD";b.onclick=function(){addQty(it.id,1)};pr.appendChild(b)}
-  else{
+  else if(hasVars){
+    var ob=document.createElement("button");ob.className="badd";
+    ob.textContent=q>0?("Options ("+q+")"):"Options ▾";
+    ob.onclick=function(){openDetail(it.id,0)};
+    pr.appendChild(ob);
+  }else if(q===0){
+    var b=document.createElement("button");b.className="badd";b.textContent="ADD";b.onclick=function(){addQty(it.id,1)};pr.appendChild(b);
+  }else{
     var qb=document.createElement("div");qb.className="qbox";
     var b1=document.createElement("button");b1.textContent="−";b1.onclick=function(){addQty(it.id,-1)};
     var sp=document.createElement("span");sp.textContent=q;
@@ -329,25 +399,34 @@ function makeCard(it){
   }
   bd.appendChild(pr);card.appendChild(bd);return card;
 }
+
 function renderDeals(){
   var deals=items.filter(function(i){return i.mrp&&Number(i.mrp)>Number(i.price)&&i.inStock!==false});
   var w=document.getElementById("dWrap"),r=document.getElementById("dRow");
   if(!deals.length){w.style.display="none";return}
   w.style.display="block";r.innerHTML="";
   deals.forEach(function(it){
-    var off=Math.round(((it.mrp-it.price)/it.mrp)*100),q=cart[it.id]||0;
+    var hasVars=it.variants&&it.variants.length>0;
+    var off=Math.round(((it.mrp-it.price)/it.mrp)*100),q=hasVars?getItemTotalQty(it.id):(cart[it.id]||0);
     var dc=document.createElement("div");dc.className="dcard";
     var clickArea=document.createElement("div");
-    clickArea.onclick=function(){openDetail(it.id)};
+    clickArea.onclick=function(){openDetail(it.id,0)};
     clickArea.innerHTML="<span class='dtag'>"+off+"% OFF</span><div class='ibox' style='height:72px;border-radius:8px;margin-bottom:5px'>"+(it.image&&it.image.length>10?"<img src='"+it.image+"'>":(it.emoji||"🛒"))+"</div><div style='font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px'>"+it.name+"</div>";
     dc.appendChild(clickArea);
     var bot=document.createElement("div");bot.style.cssText="display:flex;justify-content:space-between;align-items:center";
     bot.innerHTML="<div><span class='mrp'>₹"+it.mrp+"</span><b>₹"+it.price+"</b></div>";
-    if(q===0){var b=document.createElement("button");b.className="badd";b.style.padding="4px 10px";b.textContent="ADD";b.onclick=function(){addQty(it.id,1)};bot.appendChild(b)}
-    else{var qb=document.createElement("div");qb.className="qbox";var b1=document.createElement("button");b1.textContent="−";b1.onclick=function(){addQty(it.id,-1)};var sp=document.createElement("span");sp.textContent=q;var b2=document.createElement("button");b2.textContent="+";b2.onclick=function(){addQty(it.id,1)};qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);bot.appendChild(qb)}
+    if(hasVars){
+      var b=document.createElement("button");b.className="badd";b.style.padding="4px 8px";b.textContent=q>0?("("+q+")"):"Select";
+      b.onclick=function(){openDetail(it.id,0)};bot.appendChild(b);
+    }else if(q===0){
+      var b=document.createElement("button");b.className="badd";b.style.padding="4px 10px";b.textContent="ADD";b.onclick=function(){addQty(it.id,1)};bot.appendChild(b);
+    }else{
+      var qb=document.createElement("div");qb.className="qbox";var b1=document.createElement("button");b1.textContent="−";b1.onclick=function(){addQty(it.id,-1)};var sp=document.createElement("span");sp.textContent=q;var b2=document.createElement("button");b2.textContent="+";b2.onclick=function(){addQty(it.id,1)};qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);bot.appendChild(qb);
+    }
     dc.appendChild(bot);r.appendChild(dc);
   });
 }
+
 function renderItems(){
   if(!loaded)return;
   var q=document.getElementById("sBox").value.toLowerCase(),grid=document.getElementById("iGrid");grid.innerHTML="";
@@ -361,15 +440,18 @@ function renderWish(){
   if(!list.length){grid.innerHTML="<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px'>Wishlist is empty</p>";return}
   list.forEach(function(it){grid.appendChild(makeCard(it))});
 }
-function addQty(id,d){
+function addQty(key,d){
   if(!isOpen){alert("Store is closed!");return}
-  cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];
-  localStorage.setItem("gg_cart",JSON.stringify(cart));renderAll();
+  cart[key]=(cart[key]||0)+d;if(cart[key]<=0)delete cart[key];
+  localStorage.setItem("gg_cart_v2",JSON.stringify(cart));renderAll();
   if(document.getElementById("cartModal").style.display==="flex")renderCart();
 }
 function totals(){
   var c=0,sub=0;
-  for(var id in cart){var it=items.find(function(x){return x.id===id});if(it){c+=cart[id];sub+=Number(it.price)*cart[id]}}
+  for(var k in cart){
+    var ent=resolveCartEntry(k);
+    if(ent){c+=ent.qty;sub+=ent.price*ent.qty}
+  }
   return{c:c,sub:sub,tot:sub+FEE};
 }
 function renderAll(){
@@ -386,17 +468,17 @@ function openCart(){closeDetail();renderCart();document.getElementById("cartModa
 function closeCart(){document.getElementById("cartModal").style.display="none"}
 function renderCart(){
   var t=totals(),box=document.getElementById("cList");box.innerHTML="";
-  for(var id in cart){
-    var it=items.find(function(x){return x.id===id});if(!it)continue;
+  for(var k in cart){
+    var ent=resolveCartEntry(k);if(!ent)continue;
     var row=document.createElement("div");row.style.cssText="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F1F5F9";
-    row.innerHTML="<div><b>"+it.name+"</b><div style='font-size:12px;color:#64748B'>₹"+it.price+" × "+cart[id]+" = ₹"+(it.price*cart[id])+"</div></div>";
+    row.innerHTML="<div><b>"+ent.name+"</b><div style='font-size:12px;color:#64748B'>₹"+ent.price+" × "+ent.qty+" = ₹"+(ent.price*ent.qty)+"</div></div>";
     var qb=document.createElement("div");qb.className="qbox";
-    (function(iid,q){
-      var b1=document.createElement("button");b1.textContent="−";b1.onclick=function(){addQty(iid,-1)};
+    (function(ck,q){
+      var b1=document.createElement("button");b1.textContent="−";b1.onclick=function(){addQty(ck,-1)};
       var sp=document.createElement("span");sp.textContent=q;
-      var b2=document.createElement("button");b2.textContent="+";b2.onclick=function(){addQty(iid,1)};
+      var b2=document.createElement("button");b2.textContent="+";b2.onclick=function(){addQty(ck,1)};
       qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);
-    })(id,cart[id]);
+    })(k,ent.qty);
     row.appendChild(qb);box.appendChild(row);
   }
   document.getElementById("bItem").textContent="₹"+t.sub;
@@ -417,13 +499,13 @@ function saveAddr(){
 function placeOrder(){
   var t=totals();if(t.sub<99)return;if(!prof||!prof.house){openAddr();return}if(!db){alert("Not connected to server");return}
   var btn=document.getElementById("oBtn");btn.disabled=true;btn.textContent="Placing...";
-  var list=[];for(var id in cart){var it=items.find(function(x){return x.id===id});if(it)list.push({name:it.name,qty:cart[id],price:Number(it.price)})}
+  var list=[];for(var k in cart){var ent=resolveCartEntry(k);if(ent)list.push({name:ent.name,qty:ent.qty,price:ent.price})}
   db.collection("orders").add({
     customerName:prof.name,phone:prof.phone,address:prof.house+", "+(prof.land||"")+", "+(prof.area||""),
     items:list,itemTotal:t.sub,deliveryCharge:FEE,total:t.tot,status:"Placed",createdAt:firebase.firestore.FieldValue.serverTimestamp()
   }).then(function(ref){
     var ids=rJ("gg_oids",[]);ids.unshift(ref.id);localStorage.setItem("gg_oids",JSON.stringify(ids.slice(0,15)));
-    cart={};localStorage.setItem("gg_cart","{}");renderAll();closeCart();goTab("orders");
+    cart={};localStorage.setItem("gg_cart_v2","{}");renderAll();closeCart();goTab("orders");
   }).catch(function(e){alert(e.message);btn.disabled=false;renderCart()});
 }
 function trackPhone(){
