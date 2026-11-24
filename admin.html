@@ -38,6 +38,7 @@
   .var-row input { margin-bottom: 0; padding: 8px; font-size: 13px; }
   .var-quick { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
   .q-chip { background: #262626; color: #93C5FD; border: 1px solid #3B82F6; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .cat-pill-row { display: flex; justify-content: space-between; align-items: center; background: #161616; border: 1px solid #2C2C2C; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; }
 </style>
 </head>
 <body onclick="unlockAudio()">
@@ -65,25 +66,35 @@
 </div>
 
 <div id="menuSection" class="section">
+  <!-- Category Manager Card -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <h3 style="font-size:15px;">📁 Manage Categories</h3>
+      <span onclick="toggleCatBox()" id="catToggleTxt" style="font-size:12px;color:#2ECC71;font-weight:700;cursor:pointer;">Hide ▴</span>
+    </div>
+    <div id="catManagerBody">
+      <input type="hidden" id="editCatIdx" value="-1">
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <input type="text" id="catEmojiInp" class="input-box" placeholder="🍔" style="width:58px;text-align:center;margin-bottom:0;">
+        <input type="text" id="catNameInp" class="input-box" placeholder="Category Name (e.g. Momos & Pasta)" style="flex:1;margin-bottom:0;">
+        <button id="saveCatBtn" onclick="saveCategory()" style="background:#2ECC71;color:#000;border:none;padding:0 14px;border-radius:8px;font-weight:800;font-size:13px;cursor:pointer;">Add</button>
+      </div>
+      <div id="catListAdmin"></div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Item Card -->
   <div class="card">
     <h3 id="formTitle" style="margin-bottom:10px;font-size:16px;">Add New Item</h3>
     <input type="hidden" id="editItemId" value="">
     <input type="text" id="itemName" class="input-box" placeholder="Item Name (e.g., Cold Coffee / Cheese Burger)">
-    <select id="itemCategory" class="input-box">
-      <option value="Vegetables & Fruits">Vegetables & Fruits</option>
-      <option value="Dairy & Bread">Dairy & Bread</option>
-      <option value="Atta, Rice & Dal">Atta, Rice & Dal</option>
-      <option value="Snacks & Drinks">Snacks & Drinks</option>
-      <option value="Fast Food">Fast Food</option>
-      <option value="Daily Essentials">Daily Essentials</option>
-    </select>
+    <select id="itemCategory" class="input-box"></select>
     <div class="row-2">
       <input type="number" id="itemMrp" class="input-box" placeholder="Base MRP ₹ (Optional)">
       <input type="number" id="itemPrice" class="input-box" placeholder="Base Price ₹ *">
     </div>
     <input type="text" id="itemDesc" class="input-box" placeholder="Short Description">
 
-    <!-- Size / Custom Options Builder -->
     <div class="var-box">
       <div style="font-size:12px;font-weight:800;color:#2ECC71;margin-bottom:6px;">Sizes / Custom Options (Optional)</div>
       <div class="var-quick">
@@ -109,6 +120,16 @@
   firebase.initializeApp({ projectId: "go-groc-f488d" });
   var db = firebase.firestore();
 
+  var DEFAULT_CATS = [
+    { name: "Vegetables & Fruits", icon: "🥦" },
+    { name: "Dairy & Bread", icon: "🥛" },
+    { name: "Atta, Rice & Dal", icon: "🌾" },
+    { name: "Snacks & Drinks", icon: "🍟" },
+    { name: "Fast Food", icon: "🍔" },
+    { name: "Daily Essentials", icon: "🧴" }
+  ];
+
+  var categoriesList = DEFAULT_CATS.slice();
   var storeOpen = true;
   var compressedBase64 = "";
   var currentEmoji = "";
@@ -156,6 +177,90 @@
     btn.style.color = soundEnabled ? "#000" : "#ccc";
     if (soundEnabled) playLoudOrderBuzzer();
   }
+
+  // --- DYNAMIC CATEGORY MANAGEMENT ---
+  function toggleCatBox() {
+    var body = document.getElementById("catManagerBody");
+    var txt = document.getElementById("catToggleTxt");
+    if (body.style.display === "none") { body.style.display = "block"; txt.textContent = "Hide ▴"; }
+    else { body.style.display = "none"; txt.textContent = "Show ▾"; }
+  }
+
+  function renderCategoryUI() {
+    var sel = document.getElementById("itemCategory");
+    var prevVal = sel.value;
+    sel.innerHTML = categoriesList.map(function(c) {
+      return '<option value="' + c.name + '">' + c.icon + ' ' + c.name + '</option>';
+    }).join("");
+    if (prevVal && categoriesList.some(function(c) { return c.name === prevVal; })) sel.value = prevVal;
+
+    document.getElementById("catListAdmin").innerHTML = categoriesList.map(function(c, idx) {
+      return '<div class="cat-pill-row">' +
+        '<div style="font-size:13px;font-weight:700;">' + c.icon + ' ' + c.name + '</div>' +
+        '<div style="display:flex;gap:5px;">' +
+          '<button class="toggle-btn" style="background:#2563EB;color:#fff;" onclick="editCategory(' + idx + ')">Edit</button>' +
+          '<button class="toggle-btn" style="background:#3A1E1E;color:#E74C3C;" onclick="deleteCategory(' + idx + ')">Del</button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  function editCategory(idx) {
+    var c = categoriesList[idx];
+    if (!c) return;
+    document.getElementById("editCatIdx").value = idx;
+    document.getElementById("catEmojiInp").value = c.icon;
+    document.getElementById("catNameInp").value = c.name;
+    document.getElementById("saveCatBtn").textContent = "Update";
+  }
+
+  function saveCategory() {
+    var idx = Number(document.getElementById("editCatIdx").value);
+    var icon = document.getElementById("catEmojiInp").value.trim() || "📦";
+    var name = document.getElementById("catNameInp").value.trim();
+    if (!name) { alert("Enter category name!"); return; }
+
+    var updated = categoriesList.slice();
+    var oldName = "";
+    if (idx >= 0 && updated[idx]) {
+      oldName = updated[idx].name;
+      updated[idx] = { name: name, icon: icon };
+    } else {
+      updated.push({ name: name, icon: icon });
+    }
+
+    db.collection("settings").doc("categories").set({ list: updated }).then(function() {
+      if (oldName && oldName !== name) {
+        var batch = db.batch();
+        allMenuDocs.forEach(function(m) {
+          if (m.category === oldName) batch.update(db.collection("menu").doc(m.id), { category: name });
+        });
+        batch.commit();
+      }
+      document.getElementById("editCatIdx").value = "-1";
+      document.getElementById("catEmojiInp").value = "";
+      document.getElementById("catNameInp").value = "";
+      document.getElementById("saveCatBtn").textContent = "Add";
+    });
+  }
+
+  function deleteCategory(idx) {
+    if (categoriesList.length <= 1) { alert("At least 1 category is required!"); return; }
+    var c = categoriesList[idx];
+    if (!confirm("Delete category '" + c.name + "'?")) return;
+    var updated = categoriesList.filter(function(_, i) { return i !== idx; });
+    db.collection("settings").doc("categories").set({ list: updated });
+  }
+
+  db.collection("settings").doc("categories").onSnapshot(function(snap) {
+    if (snap.exists && Array.isArray(snap.data().list) && snap.data().list.length) {
+      categoriesList = snap.data().list;
+    } else {
+      categoriesList = DEFAULT_CATS.slice();
+      db.collection("settings").doc("categories").set({ list: categoriesList });
+    }
+    renderCategoryUI();
+  });
 
   function addVariantRow(label, price, mrp) {
     var box = document.getElementById("variantsContainer");
@@ -270,7 +375,7 @@
     document.getElementById("editItemId").value = id;
     document.getElementById("formTitle").textContent = "✏️ Edit Item";
     document.getElementById("itemName").value = m.name || "";
-    document.getElementById("itemCategory").value = m.category || "Daily Essentials";
+    document.getElementById("itemCategory").value = m.category || (categoriesList[0] ? categoriesList[0].name : "");
     document.getElementById("itemMrp").value = m.mrp || "";
     document.getElementById("itemPrice").value = m.price || "";
     document.getElementById("itemDesc").value = m.desc || "";
@@ -351,6 +456,8 @@
 
   function toggleStock(id, current) { db.collection("menu").doc(id).update({ inStock: !current }); }
   function deleteMenu(id) { if (confirm("Delete this item from menu?")) db.collection("menu").doc(id).delete(); }
+
+  renderCategoryUI();
 </script>
 </body>
 </html>
