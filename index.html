@@ -58,7 +58,6 @@
   .stp{position:relative;z-index:2;text-align:center;width:25%;font-size:10px;color:#94A3B8;font-weight:700}
   .sdot{width:20px;height:20px;border-radius:50%;background:#E2E8F0;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px}
   .stp.on{color:#16A34A}.stp.on .sdot{background:#16A34A}
-  /* Product Detail & Variant Cards */
   .pd-hero{position:relative;width:100%;height:270px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:105px;overflow:hidden}
   .pd-hero img{width:100%;height:100%;object-fit:cover}
   .pd-top-btns{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;z-index:5}
@@ -66,7 +65,7 @@
   .pd-meta{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700}
   .pd-off{background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;margin-left:6px}
   .var-scroll{display:flex;gap:10px;overflow-x:auto;padding:6px 0}
-  .v-card{min-width:115px;border:1.5px solid #E2E8F0;background:#fff;border-radius:12px;padding:10px;cursor:pointer;flex-shrink:0;transition:.15s}
+  .v-card{min-width:115px;border:1.5px solid #E2E8F0;background:#fff;border-radius:12px;padding:10px;cursor:pointer;flex-shrink:0}
   .v-card.active{border:2px solid #2563EB;background:#EFF6FF}
   .v-card-lbl{font-size:13px;font-weight:800;color:#0F172A;margin-bottom:4px}
   .v-card-prc{font-size:14px;font-weight:900;color:#0F172A}
@@ -85,28 +84,14 @@
 <div id="v-home" class="view active">
   <div id="dWrap" style="display:none"><div class="head"><b>🔥 Today's Deals</b></div><div id="dRow" class="strip"></div></div>
   <div class="head"><b>Shop by Category</b><span style="font-size:12px;font-weight:700;color:#16A34A;cursor:pointer" onclick="goTab('cat')">See all →</span></div>
-  <div id="catStrip" class="strip">
-    <div class="chip" data-c="Vegetables & Fruits" onclick="setCat('Vegetables & Fruits')"><div class="cicon">🥦</div><div class="clbl">Vegetables & Fruits</div></div>
-    <div class="chip" data-c="Dairy & Bread" onclick="setCat('Dairy & Bread')"><div class="cicon">🥛</div><div class="clbl">Dairy & Bread</div></div>
-    <div class="chip" data-c="Atta, Rice & Dal" onclick="setCat('Atta, Rice & Dal')"><div class="cicon">🌾</div><div class="clbl">Atta, Rice & Dal</div></div>
-    <div class="chip" data-c="Snacks & Drinks" onclick="setCat('Snacks & Drinks')"><div class="cicon">🍟</div><div class="clbl">Snacks & Drinks</div></div>
-    <div class="chip" data-c="Fast Food" onclick="setCat('Fast Food')"><div class="cicon">🍔</div><div class="clbl">Fast Food</div></div>
-    <div class="chip" data-c="Daily Essentials" onclick="setCat('Daily Essentials')"><div class="cicon">🧴</div><div class="clbl">Daily Essentials</div></div>
-  </div>
+  <div id="catStrip" class="strip"></div>
   <div class="head"><b id="gTitle">All Fresh Items</b><span id="allBtn" style="display:none;font-size:12px;font-weight:700;color:#16A34A;cursor:pointer" onclick="setCat('All')">Show All</span></div>
   <div id="iGrid" class="grid"><p style="grid-column:span 2;text-align:center;color:#64748B;padding:30px">Loading fresh items...</p></div>
 </div>
 
 <div id="v-cat" class="view">
   <div class="head"><b>All Categories</b></div>
-  <div class="grid">
-    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Vegetables & Fruits');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🥦</div><b>Vegetables & Fruits</b></div>
-    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Dairy & Bread');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🥛</div><b>Dairy & Bread</b></div>
-    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Atta, Rice & Dal');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🌾</div><b>Atta, Rice & Dal</b></div>
-    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Snacks & Drinks');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🍟</div><b>Snacks & Drinks</b></div>
-    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Fast Food');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🍔</div><b>Fast Food</b></div>
-    <div class="card" style="padding:16px;text-align:center;cursor:pointer" onclick="setCat('Daily Essentials');goTab('home')"><div style="font-size:34px;margin-bottom:6px">🧴</div><b>Daily Essentials</b></div>
-  </div>
+  <div id="cGrid" class="grid"></div>
 </div>
 
 <div id="v-wish" class="view"><div class="head"><b>🔖 Saved Wishlist</b></div><div id="wGrid" class="grid"></div></div>
@@ -131,7 +116,6 @@
   <div id="n-orders" class="nbtn" onclick="goTab('orders')"><div style="font-size:18px">🛵</div>Orders</div>
 </nav>
 
-<!-- Product Detail Modal -->
 <div id="pdModal" class="modal" style="z-index:260">
   <div class="pd-hero">
     <div class="pd-top-btns">
@@ -212,8 +196,35 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 var FEE=30;
+var DEFAULT_CATS=[
+  {name:"Vegetables & Fruits",icon:"🥦"},
+  {name:"Dairy & Bread",icon:"🥛"},
+  {name:"Atta, Rice & Dal",icon:"🌾"},
+  {name:"Snacks & Drinks",icon:"🍟"},
+  {name:"Fast Food",icon:"🍔"},
+  {name:"Daily Essentials",icon:"🧴"}
+];
 function rJ(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
-var db=null,items=[],orders=[],loaded=false,isOpen=true,curCat="All",detailId=null,selVarIdx=0,cart=rJ("gg_cart_v2",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
+var db=null,catList=DEFAULT_CATS.slice(),items=[],orders=[],loaded=false,isOpen=true,curCat="All",detailId=null,selVarIdx=0,cart=rJ("gg_cart_v2",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
+
+function renderCategories(){
+  var s=document.getElementById("catStrip"),g=document.getElementById("cGrid");
+  s.innerHTML="";g.innerHTML="";
+  catList.forEach(function(c){
+    var d1=document.createElement("div");
+    d1.className="chip"+(curCat===c.name?" active":"");
+    d1.innerHTML="<div class='cicon'>"+(c.icon||"📦")+"</div><div class='clbl'>"+c.name+"</div>";
+    d1.onclick=function(){setCat(c.name)};
+    s.appendChild(d1);
+
+    var d2=document.createElement("div");
+    d2.className="card";d2.style.cssText="padding:16px;text-align:center;cursor:pointer";
+    d2.innerHTML="<div style='font-size:34px;margin-bottom:6px'>"+(c.icon||"📦")+"</div><b>"+c.name+"</b>";
+    d2.onclick=function(){setCat(c.name);goTab("home")};
+    g.appendChild(d2);
+  });
+}
+renderCategories();
 
 function syncProf(){
   if(!prof||!prof.house)return;
@@ -238,7 +249,7 @@ function goTab(t){
 }
 function setCat(c){
   curCat=c;
-  document.querySelectorAll(".chip").forEach(function(el){el.classList.toggle("active",el.getAttribute("data-c")===c)});
+  renderCategories();
   document.getElementById("gTitle").textContent=c==="All"?"All Fresh Items":c;
   document.getElementById("allBtn").style.display=c==="All"?"none":"inline";
   renderItems();
@@ -262,8 +273,7 @@ function resolveCartEntry(key){
 function openDetail(id,vIdx){
   var it=items.find(function(x){return x.id===id});
   if(!it)return;
-  detailId=id;
-  selVarIdx=vIdx||0;
+  detailId=id;selVarIdx=vIdx||0;
   var med=document.getElementById("pdMedia");
   med.innerHTML=(it.image&&it.image.length>10)?"<img src='"+it.image+"'>":(it.emoji||"🛒");
   var cat=it.category||"Daily Essentials";
@@ -306,12 +316,10 @@ function renderDetailControls(){
 
   var selLbl=document.getElementById("pdSelLabel");
   if(activeVar){
-    selLbl.style.display="block";
-    selLbl.textContent="Selected: "+activeVar.label;
+    selLbl.style.display="block";selLbl.textContent="Selected: "+activeVar.label;
     document.getElementById("pdFootSub").textContent=activeVar.label;
   }else{
-    selLbl.style.display="none";
-    document.getElementById("pdFootSub").textContent="Item Price";
+    selLbl.style.display="none";document.getElementById("pdFootSub").textContent="Item Price";
   }
 
   document.getElementById("pdPrice").textContent="₹"+curPrice;
@@ -320,16 +328,12 @@ function renderDetailControls(){
   document.getElementById("pdMrp").textContent=hasMrp?"₹"+curMrp:"";
   document.getElementById("pdFootMrp").textContent=hasMrp?"₹"+curMrp:"";
   var offEl=document.getElementById("pdOff");
-  if(hasMrp){
-    offEl.style.display="inline-block";
-    offEl.textContent=Math.round(((curMrp-curPrice)/curMrp)*100)+"% OFF";
-  }else{offEl.style.display="none"}
+  if(hasMrp){offEl.style.display="inline-block";offEl.textContent=Math.round(((curMrp-curPrice)/curMrp)*100)+"% OFF"}
+  else{offEl.style.display="none"}
 
-  var vWrap=document.getElementById("pdVarWrap");
-  var vRow=document.getElementById("pdVarRow");
+  var vWrap=document.getElementById("pdVarWrap"),vRow=document.getElementById("pdVarRow");
   if(hasVars){
-    vWrap.style.display="block";
-    vRow.innerHTML="";
+    vWrap.style.display="block";vRow.innerHTML="";
     vars.forEach(function(v,idx){
       var vc=document.createElement("div");
       vc.className="v-card"+(idx===selVarIdx?" active":"");
@@ -341,24 +345,19 @@ function renderDetailControls(){
     });
   }else{vWrap.style.display="none"}
 
-  var act=document.getElementById("pdAction");
-  act.innerHTML="";
+  var act=document.getElementById("pdAction");act.innerHTML="";
   var q=cart[cartKey]||0;
-  if(it.inStock===false){
-    act.innerHTML="<span style='color:#DC2626;font-weight:800;font-size:13px'>Out of Stock</span>";
-  }else if(q===0){
+  if(it.inStock===false){act.innerHTML="<span style='color:#DC2626;font-weight:800;font-size:13px'>Out of Stock</span>"}
+  else if(q===0){
     var b=document.createElement("button");
     b.style.cssText="background:#16A34A;color:#fff;border:none;padding:11px 32px;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer";
-    b.textContent="ADD";
-    b.onclick=function(){addQty(cartKey,1)};
-    act.appendChild(b);
+    b.textContent="ADD";b.onclick=function(){addQty(cartKey,1)};act.appendChild(b);
   }else{
     var qb=document.createElement("div");qb.className="qbox";qb.style.padding="3px 6px";
     var b1=document.createElement("button");b1.style.fontSize="18px";b1.textContent="−";b1.onclick=function(){addQty(cartKey,-1)};
     var sp=document.createElement("span");sp.style.fontSize="15px";sp.textContent=q;
     var b2=document.createElement("button");b2.style.fontSize="18px";b2.textContent="+";b2.onclick=function(){addQty(cartKey,1)};
-    qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);
-    act.appendChild(qb);
+    qb.appendChild(b1);qb.appendChild(sp);qb.appendChild(b2);act.appendChild(qb);
   }
 }
 
@@ -386,8 +385,7 @@ function makeCard(it){
   else if(hasVars){
     var ob=document.createElement("button");ob.className="badd";
     ob.textContent=q>0?("Options ("+q+")"):"Options ▾";
-    ob.onclick=function(){openDetail(it.id,0)};
-    pr.appendChild(ob);
+    ob.onclick=function(){openDetail(it.id,0)};pr.appendChild(ob);
   }else if(q===0){
     var b=document.createElement("button");b.className="badd";b.textContent="ADD";b.onclick=function(){addQty(it.id,1)};pr.appendChild(b);
   }else{
@@ -448,10 +446,7 @@ function addQty(key,d){
 }
 function totals(){
   var c=0,sub=0;
-  for(var k in cart){
-    var ent=resolveCartEntry(k);
-    if(ent){c+=ent.qty;sub+=ent.price*ent.qty}
-  }
+  for(var k in cart){var ent=resolveCartEntry(k);if(ent){c+=ent.qty;sub+=ent.price*ent.qty}}
   return{c:c,sub:sub,tot:sub+FEE};
 }
 function renderAll(){
@@ -535,6 +530,9 @@ try{
   db=firebase.firestore();
   db.collection("settings").doc("store").onSnapshot(function(s){
     if(s.exists){isOpen=s.data().isOpen!==false;var el=document.getElementById("stPill");el.textContent=isOpen?"● OPEN":"● CLOSED";el.className=isOpen?"pill":"pill closed"}
+  });
+  db.collection("settings").doc("categories").onSnapshot(function(s){
+    if(s.exists&&Array.isArray(s.data().list)&&s.data().list.length){catList=s.data().list;renderCategories()}
   });
   db.collection("menu").onSnapshot(function(s){
     items=s.docs.map(function(d){return Object.assign({id:d.id},d.data())});
