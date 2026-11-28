@@ -7,13 +7,19 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
   body{background:#F4F6F9;color:#1A1D24;padding-bottom:135px}
-  header{background:#fff;padding:12px 14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  /* JioMart Style Top Store Switcher + Header */
+  .top-bar-wrap{background:#16A34A;padding:8px 10px 0;transition:background .25s}
+  .top-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+  .top-tabs::-webkit-scrollbar{display:none}
+  .ttab{flex:1;min-width:95px;text-align:center;padding:9px 10px;border-radius:14px 14px 0 0;font-size:13px;font-weight:900;cursor:pointer;background:rgba(255,255,255,.22);color:#fff;transition:.2s;white-space:nowrap}
+  .ttab.active{background:#DCFCE7;color:#14532D}
+  header{background:#DCFCE7;padding:10px 14px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:background .25s}
   .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  .logo{color:#16A34A;font-size:21px;font-weight:900}
-  .pill{font-size:11px;padding:4px 10px;border-radius:20px;background:#DCFCE7;color:#15803D;font-weight:700}
+  .logo{color:#15803D;font-size:20px;font-weight:900}
+  .pill{font-size:11px;padding:4px 10px;border-radius:20px;background:#fff;color:#15803D;font-weight:800}
   .pill.closed{background:#FEE2E2;color:#DC2626}
-  .addr{display:flex;justify-content:space-between;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:7px 10px;margin-bottom:8px;font-size:12px;cursor:pointer}
-  .search{width:100%;background:#F1F5F9;border:1px solid #E2E8F0;padding:10px 12px;border-radius:10px;font-size:14px;outline:none}
+  .addr{display:flex;justify-content:space-between;background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:12px;cursor:pointer}
+  .search{width:100%;background:#fff;border:1px solid rgba(0,0,0,.1);padding:10px 12px;border-radius:12px;font-size:14px;outline:none}
   .view{display:none}.view.active{display:block}
   .head{display:flex;justify-content:space-between;align-items:center;padding:14px 14px 8px}
   .strip{display:flex;gap:10px;overflow-x:auto;padding:6px 14px 10px}
@@ -75,8 +81,13 @@
 </style>
 </head>
 <body>
-<header>
-  <div class="top"><div class="logo">GO-GROC ⚡</div><div id="stPill" class="pill">● OPEN</div></div>
+
+<div id="topBarWrap" class="top-bar-wrap">
+  <div id="topTabsRow" class="top-tabs"></div>
+</div>
+
+<header id="mainHdr">
+  <div class="top"><div id="hdrLogo" class="logo">GO-GROC ⚡</div><div id="stPill" class="pill">● OPEN</div></div>
   <div class="addr" onclick="openAddr()"><span id="hdrAddr">📍 Add Delivery Address in Makrana</span><span style="color:#16A34A;font-weight:800">Edit ▾</span></div>
   <input type="text" id="sBox" class="search" placeholder="Search items..." oninput="renderItems()">
 </header>
@@ -196,6 +207,17 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 var FEE=30;
+var THEMES={
+  green:{bar:"#16A34A",hdr:"#DCFCE7",txt:"#14532D"},
+  yellow:{bar:"#CA8A04",hdr:"#FEF9C3",txt:"#713F12"},
+  pink:{bar:"#E11D48",hdr:"#FFE4E6",txt:"#881337"},
+  blue:{bar:"#1D4ED8",hdr:"#DBEAFE",txt:"#1E3A8A"}
+};
+var DEFAULT_TABS=[
+  {name:"Quick",icon:"⚡",theme:"yellow"},
+  {name:"Fast Food",icon:"🍔",theme:"pink"},
+  {name:"ShopAll",icon:"🛒",theme:"green"}
+];
 var DEFAULT_CATS=[
   {name:"Vegetables & Fruits",icon:"🥦"},
   {name:"Dairy & Bread",icon:"🥛"},
@@ -205,7 +227,37 @@ var DEFAULT_CATS=[
   {name:"Daily Essentials",icon:"🧴"}
 ];
 function rJ(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
-var db=null,catList=DEFAULT_CATS.slice(),items=[],orders=[],loaded=false,isOpen=true,curCat="All",detailId=null,selVarIdx=0,cart=rJ("gg_cart_v2",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
+var db=null,topTabs=DEFAULT_TABS.slice(),activeTopTab="ShopAll",catList=DEFAULT_CATS.slice(),items=[],orders=[],loaded=false,isOpen=true,curCat="All",detailId=null,selVarIdx=0,cart=rJ("gg_cart_v2",{}),wish=rJ("gg_wish",[]),prof=rJ("gg_prof",null);
+
+function renderTopTabs(){
+  var row=document.getElementById("topTabsRow");
+  if(!topTabs.some(function(t){return t.name===activeTopTab})&&topTabs.length){
+    activeTopTab=topTabs[topTabs.length-1].name;
+  }
+  var curObj=topTabs.find(function(t){return t.name===activeTopTab})||topTabs[0];
+  var th=THEMES[(curObj&&curObj.theme)||"green"]||THEMES.green;
+  document.getElementById("topBarWrap").style.background=th.bar;
+  document.getElementById("mainHdr").style.background=th.hdr;
+  document.getElementById("hdrLogo").style.color=th.txt;
+
+  row.innerHTML="";
+  topTabs.forEach(function(t){
+    var isAct=t.name===activeTopTab;
+    var el=document.createElement("div");
+    el.className="ttab"+(isAct?" active":"");
+    if(isAct){el.style.background=th.hdr;el.style.color=th.txt}
+    el.textContent=(t.icon||"")+" "+t.name;
+    el.onclick=function(){activeTopTab=t.name;curCat="All";renderTopTabs();renderAll();goTab("home")};
+    row.appendChild(el);
+  });
+}
+
+function getScopedItems(){
+  if(!activeTopTab||activeTopTab.toLowerCase()==="shopall")return items;
+  var hasTagged=items.some(function(i){return i.storeTab&&i.storeTab!=="ALL"});
+  if(!hasTagged)return items;
+  return items.filter(function(i){return !i.storeTab||i.storeTab==="ALL"||i.storeTab===activeTopTab});
+}
 
 function renderCategories(){
   var s=document.getElementById("catStrip"),g=document.getElementById("cGrid");
@@ -224,6 +276,7 @@ function renderCategories(){
     g.appendChild(d2);
   });
 }
+renderTopTabs();
 renderCategories();
 
 function syncProf(){
@@ -399,7 +452,8 @@ function makeCard(it){
 }
 
 function renderDeals(){
-  var deals=items.filter(function(i){return i.mrp&&Number(i.mrp)>Number(i.price)&&i.inStock!==false});
+  var scoped=getScopedItems();
+  var deals=scoped.filter(function(i){return i.mrp&&Number(i.mrp)>Number(i.price)&&i.inStock!==false});
   var w=document.getElementById("dWrap"),r=document.getElementById("dRow");
   if(!deals.length){w.style.display="none";return}
   w.style.display="block";r.innerHTML="";
@@ -427,9 +481,10 @@ function renderDeals(){
 
 function renderItems(){
   if(!loaded)return;
+  var scoped=getScopedItems();
   var q=document.getElementById("sBox").value.toLowerCase(),grid=document.getElementById("iGrid");grid.innerHTML="";
-  var list=items.filter(function(i){return(i.name||"").toLowerCase().indexOf(q)!==-1&&(curCat==="All"||(i.category||"Daily Essentials")===curCat)});
-  if(!list.length){grid.innerHTML="<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px'>No items in store yet</p>";return}
+  var list=scoped.filter(function(i){return(i.name||"").toLowerCase().indexOf(q)!==-1&&(curCat==="All"||(i.category||"Daily Essentials")===curCat)});
+  if(!list.length){grid.innerHTML="<p style='grid-column:span 2;text-align:center;color:#64748B;padding:30px'>No items in this section yet</p>";return}
   list.forEach(function(it){grid.appendChild(makeCard(it))});
 }
 function renderWish(){
@@ -530,6 +585,9 @@ try{
   db=firebase.firestore();
   db.collection("settings").doc("store").onSnapshot(function(s){
     if(s.exists){isOpen=s.data().isOpen!==false;var el=document.getElementById("stPill");el.textContent=isOpen?"● OPEN":"● CLOSED";el.className=isOpen?"pill":"pill closed"}
+  });
+  db.collection("settings").doc("storeTabs").onSnapshot(function(s){
+    if(s.exists&&Array.isArray(s.data().list)&&s.data().list.length){topTabs=s.data().list;renderTopTabs();renderAll()}
   });
   db.collection("settings").doc("categories").onSnapshot(function(s){
     if(s.exists&&Array.isArray(s.data().list)&&s.data().list.length){catList=s.data().list;renderCategories()}
