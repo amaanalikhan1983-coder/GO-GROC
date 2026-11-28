@@ -7,7 +7,6 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
   body{background:#F4F6F9;color:#1A1D24;padding-bottom:135px}
-  /* JioMart Style Top Store Switcher + Header */
   .top-bar-wrap{background:#16A34A;padding:8px 10px 0;transition:background .25s}
   .top-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
   .top-tabs::-webkit-scrollbar{display:none}
@@ -247,22 +246,24 @@ function renderTopTabs(){
     el.className="ttab"+(isAct?" active":"");
     if(isAct){el.style.background=th.hdr;el.style.color=th.txt}
     el.textContent=(t.icon||"")+" "+t.name;
-    el.onclick=function(){activeTopTab=t.name;curCat="All";renderTopTabs();renderAll();goTab("home")};
+    el.onclick=function(){activeTopTab=t.name;curCat="All";renderTopTabs();renderCategories();renderAll();goTab("home")};
     row.appendChild(el);
   });
 }
 
 function getScopedItems(){
   if(!activeTopTab||activeTopTab.toLowerCase()==="shopall")return items;
-  var hasTagged=items.some(function(i){return i.storeTab&&i.storeTab!=="ALL"});
-  if(!hasTagged)return items;
-  return items.filter(function(i){return !i.storeTab||i.storeTab==="ALL"||i.storeTab===activeTopTab});
+  return items.filter(function(i){return i.storeTab===activeTopTab||i.storeTab==="ALL"});
 }
 
 function renderCategories(){
   var s=document.getElementById("catStrip"),g=document.getElementById("cGrid");
   s.innerHTML="";g.innerHTML="";
-  catList.forEach(function(c){
+  var scoped=getScopedItems();
+  var visibleCats=(activeTopTab.toLowerCase()==="shopall")?catList:catList.filter(function(c){
+    return scoped.some(function(i){return(i.category||"Daily Essentials")===c.name});
+  });
+  visibleCats.forEach(function(c){
     var d1=document.createElement("div");
     d1.className="chip"+(curCat===c.name?" active":"");
     d1.innerHTML="<div class='cicon'>"+(c.icon||"📦")+"</div><div class='clbl'>"+c.name+"</div>";
@@ -505,7 +506,7 @@ function totals(){
   return{c:c,sub:sub,tot:sub+FEE};
 }
 function renderAll(){
-  renderDeals();renderItems();renderWish();
+  renderCategories();renderDeals();renderItems();renderWish();
   if(detailId)renderDetailControls();
   var t=totals(),bar=document.getElementById("cBar");
   if(t.c===0){bar.style.display="none";closeCart();return}
