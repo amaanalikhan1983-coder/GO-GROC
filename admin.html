@@ -66,17 +66,40 @@
 </div>
 
 <div id="menuSection" class="section">
+  <!-- Top Store Tabs Manager Card -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <h3 style="font-size:15px;">🏪 Manage Top Store Tabs</h3>
+      <span onclick="toggleBox('tabManagerBody', this)" style="font-size:12px;color:#2ECC71;font-weight:700;cursor:pointer;">Hide ▴</span>
+    </div>
+    <div id="tabManagerBody">
+      <input type="hidden" id="editStoreTabIdx" value="-1">
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input type="text" id="stTabIcon" class="input-box" placeholder="⚡" style="width:52px;text-align:center;margin-bottom:0;">
+        <input type="text" id="stTabName" class="input-box" placeholder="Tab Name (e.g. Quick / Fast Food)" style="flex:1;margin-bottom:0;">
+        <select id="stTabTheme" class="input-box" style="width:105px;margin-bottom:0;padding:8px;">
+          <option value="green">🟢 Green</option>
+          <option value="yellow">🟡 Yellow</option>
+          <option value="pink">🔴 Pink/Red</option>
+          <option value="blue">🔵 Blue</option>
+        </select>
+      </div>
+      <button id="saveStTabBtn" onclick="saveStoreTab()" style="width:100%;background:#2ECC71;color:#000;border:none;padding:9px;border-radius:8px;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:10px;">+ Add Top Tab</button>
+      <div id="storeTabsAdminList"></div>
+    </div>
+  </div>
+
   <!-- Category Manager Card -->
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
       <h3 style="font-size:15px;">📁 Manage Categories</h3>
-      <span onclick="toggleCatBox()" id="catToggleTxt" style="font-size:12px;color:#2ECC71;font-weight:700;cursor:pointer;">Hide ▴</span>
+      <span onclick="toggleBox('catManagerBody', this)" style="font-size:12px;color:#2ECC71;font-weight:700;cursor:pointer;">Show ▾</span>
     </div>
-    <div id="catManagerBody">
+    <div id="catManagerBody" style="display:none;">
       <input type="hidden" id="editCatIdx" value="-1">
       <div style="display:flex;gap:6px;margin-bottom:10px;">
         <input type="text" id="catEmojiInp" class="input-box" placeholder="🍔" style="width:58px;text-align:center;margin-bottom:0;">
-        <input type="text" id="catNameInp" class="input-box" placeholder="Category Name (e.g. Momos & Pasta)" style="flex:1;margin-bottom:0;">
+        <input type="text" id="catNameInp" class="input-box" placeholder="Category Name" style="flex:1;margin-bottom:0;">
         <button id="saveCatBtn" onclick="saveCategory()" style="background:#2ECC71;color:#000;border:none;padding:0 14px;border-radius:8px;font-weight:800;font-size:13px;cursor:pointer;">Add</button>
       </div>
       <div id="catListAdmin"></div>
@@ -88,7 +111,10 @@
     <h3 id="formTitle" style="margin-bottom:10px;font-size:16px;">Add New Item</h3>
     <input type="hidden" id="editItemId" value="">
     <input type="text" id="itemName" class="input-box" placeholder="Item Name (e.g., Cold Coffee / Cheese Burger)">
-    <select id="itemCategory" class="input-box"></select>
+    <div class="row-2">
+      <select id="itemStoreTab" class="input-box"></select>
+      <select id="itemCategory" class="input-box"></select>
+    </div>
     <div class="row-2">
       <input type="number" id="itemMrp" class="input-box" placeholder="Base MRP ₹ (Optional)">
       <input type="number" id="itemPrice" class="input-box" placeholder="Base Price ₹ *">
@@ -120,6 +146,12 @@
   firebase.initializeApp({ projectId: "go-groc-f488d" });
   var db = firebase.firestore();
 
+  var DEFAULT_TABS = [
+    { name: "Quick", icon: "⚡", theme: "yellow" },
+    { name: "Fast Food", icon: "🍔", theme: "pink" },
+    { name: "ShopAll", icon: "🛒", theme: "green" }
+  ];
+
   var DEFAULT_CATS = [
     { name: "Vegetables & Fruits", icon: "🥦" },
     { name: "Dairy & Bread", icon: "🥛" },
@@ -129,6 +161,7 @@
     { name: "Daily Essentials", icon: "🧴" }
   ];
 
+  var storeTabsList = DEFAULT_TABS.slice();
   var categoriesList = DEFAULT_CATS.slice();
   var storeOpen = true;
   var compressedBase64 = "";
@@ -178,14 +211,93 @@
     if (soundEnabled) playLoudOrderBuzzer();
   }
 
-  // --- DYNAMIC CATEGORY MANAGEMENT ---
-  function toggleCatBox() {
-    var body = document.getElementById("catManagerBody");
-    var txt = document.getElementById("catToggleTxt");
-    if (body.style.display === "none") { body.style.display = "block"; txt.textContent = "Hide ▴"; }
-    else { body.style.display = "none"; txt.textContent = "Show ▾"; }
+  function toggleBox(id, el) {
+    var box = document.getElementById(id);
+    if (box.style.display === "none") { box.style.display = "block"; el.textContent = "Hide ▴"; }
+    else { box.style.display = "none"; el.textContent = "Show ▾"; }
   }
 
+  // --- TOP STORE TABS MANAGEMENT ---
+  function renderStoreTabsUI() {
+    var sel = document.getElementById("itemStoreTab");
+    var prev = sel.value;
+    sel.innerHTML = '<option value="ALL">🌐 All Top Tabs</option>' + storeTabsList.map(function(t) {
+      return '<option value="' + t.name + '">' + t.icon + ' ' + t.name + '</option>';
+    }).join("");
+    if (prev) sel.value = prev;
+
+    var themeBadge = { green: "🟢 Green", yellow: "🟡 Yellow", pink: "🔴 Pink", blue: "🔵 Blue" };
+    document.getElementById("storeTabsAdminList").innerHTML = storeTabsList.map(function(t, idx) {
+      return '<div class="cat-pill-row">' +
+        '<div style="font-size:13px;font-weight:700;">' + t.icon + ' ' + t.name + ' <span style="font-size:10px;color:#999;">(' + (themeBadge[t.theme] || t.theme) + ')</span></div>' +
+        '<div style="display:flex;gap:5px;">' +
+          '<button class="toggle-btn" style="background:#2563EB;color:#fff;" onclick="editStoreTab(' + idx + ')">Edit</button>' +
+          '<button class="toggle-btn" style="background:#3A1E1E;color:#E74C3C;" onclick="deleteStoreTab(' + idx + ')">Del</button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  function editStoreTab(idx) {
+    var t = storeTabsList[idx];
+    if (!t) return;
+    document.getElementById("editStoreTabIdx").value = idx;
+    document.getElementById("stTabIcon").value = t.icon;
+    document.getElementById("stTabName").value = t.name;
+    document.getElementById("stTabTheme").value = t.theme || "green";
+    document.getElementById("saveStTabBtn").textContent = "Update Top Tab";
+  }
+
+  function saveStoreTab() {
+    var idx = Number(document.getElementById("editStoreTabIdx").value);
+    var icon = document.getElementById("stTabIcon").value.trim() || "⚡";
+    var name = document.getElementById("stTabName").value.trim();
+    var theme = document.getElementById("stTabTheme").value;
+    if (!name) { alert("Enter Top Tab name!"); return; }
+
+    var updated = storeTabsList.slice();
+    var oldName = "";
+    if (idx >= 0 && updated[idx]) {
+      oldName = updated[idx].name;
+      updated[idx] = { name: name, icon: icon, theme: theme };
+    } else {
+      updated.push({ name: name, icon: icon, theme: theme });
+    }
+
+    db.collection("settings").doc("storeTabs").set({ list: updated }).then(function() {
+      if (oldName && oldName !== name) {
+        var batch = db.batch();
+        allMenuDocs.forEach(function(m) {
+          if (m.storeTab === oldName) batch.update(db.collection("menu").doc(m.id), { storeTab: name });
+        });
+        batch.commit();
+      }
+      document.getElementById("editStoreTabIdx").value = "-1";
+      document.getElementById("stTabIcon").value = "";
+      document.getElementById("stTabName").value = "";
+      document.getElementById("saveStTabBtn").textContent = "+ Add Top Tab";
+    });
+  }
+
+  function deleteStoreTab(idx) {
+    if (storeTabsList.length <= 1) { alert("At least 1 top tab is required!"); return; }
+    var t = storeTabsList[idx];
+    if (!confirm("Delete top tab '" + t.name + "'?")) return;
+    var updated = storeTabsList.filter(function(_, i) { return i !== idx; });
+    db.collection("settings").doc("storeTabs").set({ list: updated });
+  }
+
+  db.collection("settings").doc("storeTabs").onSnapshot(function(snap) {
+    if (snap.exists && Array.isArray(snap.data().list) && snap.data().list.length) {
+      storeTabsList = snap.data().list;
+    } else {
+      storeTabsList = DEFAULT_TABS.slice();
+      db.collection("settings").doc("storeTabs").set({ list: storeTabsList });
+    }
+    renderStoreTabsUI();
+  });
+
+  // --- DYNAMIC CATEGORY MANAGEMENT ---
   function renderCategoryUI() {
     var sel = document.getElementById("itemCategory");
     var prevVal = sel.value;
@@ -375,6 +487,7 @@
     document.getElementById("editItemId").value = id;
     document.getElementById("formTitle").textContent = "✏️ Edit Item";
     document.getElementById("itemName").value = m.name || "";
+    document.getElementById("itemStoreTab").value = m.storeTab || "ALL";
     document.getElementById("itemCategory").value = m.category || (categoriesList[0] ? categoriesList[0].name : "");
     document.getElementById("itemMrp").value = m.mrp || "";
     document.getElementById("itemPrice").value = m.price || "";
@@ -409,6 +522,7 @@
   function saveMenuItem() {
     var editId = document.getElementById("editItemId").value;
     var name = document.getElementById("itemName").value.trim();
+    var storeTab = document.getElementById("itemStoreTab").value;
     var category = document.getElementById("itemCategory").value;
     var mrp = Number(document.getElementById("itemMrp").value) || 0;
     var price = Number(document.getElementById("itemPrice").value);
@@ -419,7 +533,7 @@
 
     var btn = document.getElementById("addItemBtn");
     btn.disabled = true; btn.textContent = "Saving...";
-    var data = { name: name, category: category, mrp: mrp, price: price, desc: desc, variants: variants, image: compressedBase64, emoji: currentEmoji || "🛒" };
+    var data = { name: name, storeTab: storeTab, category: category, mrp: mrp, price: price, desc: desc, variants: variants, image: compressedBase64, emoji: currentEmoji || "🛒" };
 
     var op = editId
       ? db.collection("menu").doc(editId).update(data)
@@ -434,13 +548,14 @@
     document.getElementById("menuCount").textContent = allMenuDocs.length;
     document.getElementById("menuList").innerHTML = allMenuDocs.map(function(m) {
       var stock = m.inStock !== false;
+      var tBadge = (m.storeTab && m.storeTab !== "ALL") ? ' <span style="background:#374151;color:#FBBF24;font-size:10px;padding:1px 5px;border-radius:4px;">' + m.storeTab + '</span>' : '';
       var vCount = (m.variants && m.variants.length) ? ' <span style="background:#1E3A8A;color:#93C5FD;font-size:10px;padding:1px 6px;border-radius:4px;">' + m.variants.length + ' options</span>' : '';
       var thumb = m.image ? '<img src="' + m.image + '">' : (m.emoji || "🛒");
       return '<div class="menu-row">' +
         '<div style="display:flex;align-items:center;flex:1;min-width:0;">' +
           '<div class="menu-thumb">' + thumb + '</div>' +
           '<div style="min-width:0;">' +
-            '<div style="font-size:10px;color:#2ECC71;font-weight:700;">' + (m.category || "Daily Essentials") + vCount + '</div>' +
+            '<div style="font-size:10px;color:#2ECC71;font-weight:700;">' + (m.category || "Daily Essentials") + tBadge + vCount + '</div>' +
             '<div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + m.name + '</div>' +
             '<div style="color:#2ECC71;font-weight:700;font-size:13px;">₹' + m.price + '</div>' +
           '</div>' +
@@ -457,6 +572,7 @@
   function toggleStock(id, current) { db.collection("menu").doc(id).update({ inStock: !current }); }
   function deleteMenu(id) { if (confirm("Delete this item from menu?")) db.collection("menu").doc(id).delete(); }
 
+  renderStoreTabsUI();
   renderCategoryUI();
 </script>
 </body>
